@@ -1,0 +1,7 @@
+year,bev_wholesales_units,growth_yoy_pct,source,confidence,notes
+2020,125,,GAIKINDO/ICCT,medium,"Annual BEV wholesales; value requires final primary-source verification."
+2021,687,449.6,GAIKINDO/ICCT,medium,"Annual BEV wholesales; value requires final primary-source verification."
+2022,10327,1403.2,GAIKINDO,high,"Annual BEV wholesales reported by GAIKINDO-derived sources."
+2023,17051,65.1,GAIKINDO,high,"Annual BEV wholesales reported by GAIKINDO-derived sources."
+2024,43188,153.3,GAIKINDO,high,"Annual BEV wholesales reported by GAIKINDO-derived sources."
+2025,103931,140.6,GAIKINDO,high,"Annual BEV wholesales; final figure should be checked against official GAIKINDO article/infographic."

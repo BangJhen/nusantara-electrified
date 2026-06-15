@@ -1,0 +1,5 @@
+scenario,grid_factor_kgco2e_per_kwh,bev_efficiency_kwh_per_km,bev_use_phase_gco2e_per_km,ice_baseline_gco2e_per_km,bev_use_phase_reduction_vs_ice_pct,source,notes
+current_indonesia_grid,0.680,0.19,129.2,235,45.0,Ember grid factor + typical BEV efficiency + ICCT ICE baseline,"Use-phase only. Full lifecycle requires battery/vehicle manufacturing assumptions."
+global_average_grid,0.435,0.19,82.7,235,64.8,IEA global avg + typical BEV efficiency,"Comparator scenario."
+clean_grid_scenario,0.200,0.19,38.0,235,83.8,scenario assumption,"Illustrates benefit of grid decarbonization."
+norway_like_grid,0.028,0.19,5.3,235,97.7,Ember comparator + typical BEV efficiency,"Extreme clean-grid benchmark."

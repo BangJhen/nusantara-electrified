@@ -1,0 +1,69 @@
+{
+  "project": "Nusantara Electrified",
+  "primary_narrative": "EV Indonesia melaju cepat, tapi keberhasilannya ditentukan oleh kesiapan industri dan kebersihan listrik.",
+  "recommended_frontend_stack": ["Next.js", "React", "TypeScript", "Tailwind CSS", "D3/Recharts", "MapLibre or Leaflet", "Framer Motion"],
+  "core_sections": [
+    {
+      "id": "opening",
+      "title": "Nusantara Electrified",
+      "purpose": "Hero section with core thesis and headline metrics.",
+      "datasets": ["processed/indonesia_bev_annual_sales.csv", "processed/spklu_dataset_summary.json"]
+    },
+    {
+      "id": "adoption-growth",
+      "title": "EV Melaju Cepat",
+      "purpose": "Show BEV annual growth and market acceleration.",
+      "datasets": ["processed/indonesia_bev_annual_sales.csv", "processed/aisi_motorcycle_annual_summary.csv"]
+    },
+    {
+      "id": "charging-map",
+      "title": "Infrastruktur Mengejar",
+      "purpose": "Show SPKLU geography, province concentration, connector types, and operator mix.",
+      "datasets": ["processed/SPKLU-LOKASI_processed.csv", "processed/spklu_station_counts_by_province.csv", "processed/spklu_station_counts_by_operator.csv", "processed/spklu_connector_type_counts.csv"]
+    },
+    {
+      "id": "emission-calculator",
+      "title": "Seberapa Hijau EV?",
+      "purpose": "Interactive grid-emission slider and EV vs ICE emissions comparison.",
+      "datasets": ["processed/ev_emission_scenario_indonesia.csv", "processed/ev_lca_emission_factors_icct.csv", "processed/indonesia_electricity_mix_and_grid.csv"]
+    },
+    {
+      "id": "industry-stack",
+      "title": "Dari Nikel ke Mobil Listrik",
+      "purpose": "Explain EV industrial value chain, investment, capacity, TKDN, and risks.",
+      "datasets": ["processed/ev_industry_investment_and_capacity.csv", "processed/ev_industry_targets_and_risks.csv"]
+    },
+    {
+      "id": "nickel-grid-paradox",
+      "title": "Nickel & Grid Paradox",
+      "purpose": "Show the two central tensions: nickel opportunity versus LFP/smelter risk, and EV climate benefit versus coal-heavy grid.",
+      "datasets": ["processed/ev_industry_targets_and_risks.csv", "processed/indonesia_electricity_mix_and_grid.csv", "processed/ev_emission_scenario_indonesia.csv"]
+    },
+    {
+      "id": "consumer-barriers",
+      "title": "Bukan Menolak, Masih Ragu",
+      "purpose": "Summarize public barriers and sentiment sources.",
+      "datasets": ["processed/sentiment_source_summary.json"]
+    },
+    {
+      "id": "closing",
+      "title": "Tiga Syarat EV Menjadi Transformasi Nasional",
+      "purpose": "Close with actionable synthesis: infrastructure, clean grid, local industry readiness.",
+      "datasets": ["sources/source_catalog.json"]
+    }
+  ],
+  "visual_priority": [
+    "BEV annual growth line/bar hybrid",
+    "SPKLU map with province ranking",
+    "EV emissions slider by grid factor",
+    "EV industry value-chain diagram",
+    "RUPTL capacity mix stacked bar",
+    "Consumer barriers cards"
+  ],
+  "required_caveats": [
+    "GAIKINDO image-derived figures require final verification.",
+    "SPKLU local CSV upstream URL must be cited before final submission.",
+    "Investment data must distinguish announced vs operational capacity.",
+    "Grid factor is Ember-derived open estimate, not a latest official KLHK/ESDM number."
+  ]
+}

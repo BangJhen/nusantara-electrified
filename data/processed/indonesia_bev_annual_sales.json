@@ -1,0 +1,8 @@
+[
+  {"year": 2020, "bev_wholesales_units": 125, "growth_yoy_pct": null, "source": "GAIKINDO/ICCT", "confidence": "medium", "notes": "Annual BEV wholesales; value requires final primary-source verification."},
+  {"year": 2021, "bev_wholesales_units": 687, "growth_yoy_pct": 449.6, "source": "GAIKINDO/ICCT", "confidence": "medium", "notes": "Annual BEV wholesales; value requires final primary-source verification."},
+  {"year": 2022, "bev_wholesales_units": 10327, "growth_yoy_pct": 1403.2, "source": "GAIKINDO", "confidence": "high", "notes": "Annual BEV wholesales reported by GAIKINDO-derived sources."},
+  {"year": 2023, "bev_wholesales_units": 17051, "growth_yoy_pct": 65.1, "source": "GAIKINDO", "confidence": "high", "notes": "Annual BEV wholesales reported by GAIKINDO-derived sources."},
+  {"year": 2024, "bev_wholesales_units": 43188, "growth_yoy_pct": 153.3, "source": "GAIKINDO", "confidence": "high", "notes": "Annual BEV wholesales reported by GAIKINDO-derived sources."},
+  {"year": 2025, "bev_wholesales_units": 103931, "growth_yoy_pct": 140.6, "source": "GAIKINDO", "confidence": "high", "notes": "Annual BEV wholesales; final figure should be checked against official GAIKINDO article/infographic."}
+]

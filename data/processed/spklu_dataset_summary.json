@@ -1,0 +1,235 @@
+{
+  "SPKLU-LOKASI.csv": {
+    "rows": 2426,
+    "columns": [
+      "Nomor",
+      "Nomor Identitias",
+      "Badan Usaha",
+      "Nama Stasiun",
+      "Skema SPKLU",
+      "Provinsi",
+      "Kabupaten / Kota",
+      "Alamat",
+      "Latitude",
+      "Longitude",
+      "Tanggal Pengajuan",
+      "Tanggal Verifikasi",
+      "Status Terintegrasi",
+      "Total Transaksi",
+      "Total Konsumsi Listrik",
+      "Total Pendapatan"
+    ]
+  },
+  "SPKLU-MESIN.csv": {
+    "rows": 2423,
+    "columns": [
+      "Nomor Identitias",
+      "Nama Stasiun",
+      "Merek Mesin",
+      "Jenis Pengisian",
+      "Status Instalasi",
+      "Harga Pengisian (Rp)",
+      "Harga Layanan (Rp)",
+      "Daya",
+      "Jumlah Nozzle",
+      "Arus Maksimal",
+      "Peralatan Catu Daya Listrik",
+      "Sistem Kontrol Arus Mesin",
+      "Sistem Kontrol Tegangan Mesin",
+      "Sistem Kontrol Komunikasi Mesin",
+      "Sistem Keamanan Mesin",
+      "GPS",
+      "Panjang Mesin (Cm)",
+      "Lebar Mesin (Cm)",
+      "Tinggi Mesin (Cm)",
+      "Berat Mesin (Kg)",
+      "Panjang Nozzle (Cm)",
+      "Lebar Nozzle (Cm)",
+      "Tinggi Nozzle (Cm)",
+      "Diameter Nozzle (Cm)"
+    ]
+  },
+  "SPKLU-KONEKTOR.csv": {
+    "rows": 3053,
+    "columns": [
+      "Nomor Identitias",
+      "Nama Stasiun",
+      "Merek Mesin",
+      "Jenis Konektor",
+      "Status Konektor",
+      "Status Instalasi",
+      "Port",
+      "Harga (Rp)"
+    ]
+  },
+  "province_col": "Provinsi",
+  "province_summary": [
+    {
+      "province": "DKI Jakarta",
+      "station_count": 423
+    },
+    {
+      "province": "Jawa Barat",
+      "station_count": 388
+    },
+    {
+      "province": "Jawa Timur",
+      "station_count": 231
+    },
+    {
+      "province": "Jawa Tengah",
+      "station_count": 228
+    },
+    {
+      "province": "Banten",
+      "station_count": 195
+    },
+    {
+      "province": "Bali",
+      "station_count": 136
+    },
+    {
+      "province": "Sumatera Utara",
+      "station_count": 75
+    },
+    {
+      "province": "Kalimantan Timur",
+      "station_count": 71
+    },
+    {
+      "province": "Sumatera Barat",
+      "station_count": 61
+    },
+    {
+      "province": "Lampung",
+      "station_count": 57
+    },
+    {
+      "province": "Riau",
+      "station_count": 54
+    },
+    {
+      "province": "Kalimantan Barat",
+      "station_count": 50
+    },
+    {
+      "province": "Sulawesi Selatan",
+      "station_count": 49
+    },
+    {
+      "province": "Sumatera Selatan",
+      "station_count": 43
+    },
+    {
+      "province": "Nusa Tenggara Barat",
+      "station_count": 39
+    }
+  ],
+  "connector_status_summary_col": "Status Konektor",
+  "connector_status_summary": [
+    {
+      "status": "available",
+      "count": 2125
+    },
+    {
+      "status": "finishing",
+      "count": 520
+    },
+    {
+      "status": "UNKNOWN",
+      "count": 222
+    },
+    {
+      "status": "charging",
+      "count": 179
+    },
+    {
+      "status": "unavailable",
+      "count": 7
+    }
+  ],
+  "operator_summary": [
+    {
+      "operator": "PERUSAHAAN PERSEROAN (PERSERO) PT. PERUSAHAAN LISTRIK NEGARA",
+      "station_count": "2154"
+    },
+    {
+      "operator": "SUMBER DAYA ALAMINDO",
+      "station_count": "128"
+    },
+    {
+      "operator": "PT UTOMO CHARGEPLUS INDONESIA",
+      "station_count": "35"
+    },
+    {
+      "operator": "EXELLY ELEKTRIK INDONESIA",
+      "station_count": "22"
+    },
+    {
+      "operator": "ARDENDI JAYA SENTOSA",
+      "station_count": "19"
+    },
+    {
+      "operator": "PT SHELL INDONESIA",
+      "station_count": "15"
+    },
+    {
+      "operator": "SMART ENERGY SYSTEMS",
+      "station_count": "11"
+    },
+    {
+      "operator": "PT HYUNDAI SOLUSI MOBILITAS",
+      "station_count": "10"
+    },
+    {
+      "operator": "ENERGI MAKMUR BUANA",
+      "station_count": "8"
+    },
+    {
+      "operator": "SARI SARANA KIMIATAMA",
+      "station_count": "8"
+    },
+    {
+      "operator": "PERTAMINA RETAIL",
+      "station_count": "5"
+    },
+    {
+      "operator": "PANCA PILAR INDONESIA",
+      "station_count": "5"
+    },
+    {
+      "operator": "PT STARVO GLOBAL ENERGI",
+      "station_count": "4"
+    },
+    {
+      "operator": "BUZZ BERKAT INDONESIA",
+      "station_count": "2"
+    }
+  ],
+  "connector_type_summary": [
+    {
+      "connector_type": "AC (Tipe 2)",
+      "count": "1810"
+    },
+    {
+      "connector_type": "CCS2",
+      "count": "839"
+    },
+    {
+      "connector_type": "CHAdeMO",
+      "count": "274"
+    },
+    {
+      "connector_type": "J1772 (Tipe 1)",
+      "count": "99"
+    },
+    {
+      "connector_type": "Mennekes (Tipe 2)",
+      "count": "30"
+    },
+    {
+      "connector_type": "CCS1",
+      "count": "1"
+    }
+  ]
+}

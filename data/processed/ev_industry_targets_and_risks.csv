@@ -1,0 +1,11 @@
+theme,metric,value,year,source,credibility,story_use,notes
+national_target,electric_cars_on_road,2000000,2030,Government EV target / MEMR,high,"Scale of ambition","Verify exact legal basis in Presidential Regulation or MEMR document."
+national_target,electric_two_wheelers_on_road,12900000,2030,Government EV target / MEMR,high,"Mass-market opportunity","Two-wheelers are more relevant to broad public adoption."
+battery_target,battery_cell_capacity_gwh,140,2030,Nickel Institute / IBC / government statements,medium_high,"Battery hub ambition","Need final official quote if used in competition."
+local_content,TKDN_minimum_for_ev_incentive_pct,40,2025,Ministry of Industry rules,high,"Localization tension","Companies can receive incentives if local content rules are met; rule details can change."
+risk,LFP_battery_shift,no_nickel_required,2025,Industry research / BNEF style sources,medium,"Nickel strategy risk","Frame qualitatively unless using a specific verified dataset."
+challenge,smelter_projects_stalled,21,2025,Center for Global Sustainability University of Maryland,high,"Ambition vs execution","Shows not every downstreaming project becomes productive capacity."
+challenge,smelter_projects_stopped,5,2025,Center for Global Sustainability University of Maryland,high,"Ambition vs execution","Reported reasons include coal input cost and nickel price pressure."
+market_barrier,ev_price_to_average_income_ratio,10,2025,Research and market estimates,medium,"Consumer affordability","Use as illustrative, not official statistic."
+employment,current_automotive_jobs,1500000,current,ICCT / industry context,high,"Industrial transition stakes","Shows why EV transition affects national employment."
+employment,automotive_gdp_contribution_pct,8,current,ICCT / industry context,high,"Industrial transition stakes","Use to connect EV with national industry."
