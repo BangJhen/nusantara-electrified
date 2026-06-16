@@ -685,21 +685,82 @@ function OperatorDonut({ data, total }: { data: { name: string; value: number; c
 }
 
 function EmissionPanel() {
+  const [activeBar, setActiveBar] = useState<string | null>(null);
+  const { pos, onMouseMove } = useCursorTooltip();
+
+  const metrics = [
+    { key: "id", label: "Indonesia", value: 0.680, unit: "kgCO₂e/kWh", color: BRAND.blue, desc: "Faktor emisi jaringan listrik nasional" },
+    { key: "global", label: "Rata-rata Global", value: 0.435, unit: "kgCO₂e/kWh", color: BRAND.orange, desc: "Rata-rata emisi listrik seluruh dunia" },
+    { key: "ev", label: "BEV vs ICE", value: 0.33, unit: "kali emisi ICE", color: BRAND.green, desc: "BEV hanya 33% emisi dari kendaraan bensin" },
+  ];
+
+  const maxVal = Math.max(...metrics.map(m => m.value));
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-2">
-        <SmallMetric label="Indonesia" value="0,680" suffix="kgCO₂e/kWh" tone="blue" />
-        <SmallMetric label="Rata-rata global" value="0,435" suffix="kgCO₂e/kWh" tone="orange" />
-        <SmallMetric label="Rasio" value="1,56x" suffix="lebih tinggi" tone="blue" />
+    <div className="flex h-full flex-col gap-4 pt-1" onMouseMove={onMouseMove} onMouseLeave={() => setActiveBar(null)}>
+      {/* Comparison bar chart */}
+      <div className="flex flex-col gap-3">
+        {metrics.map((m) => {
+          const isActive = activeBar === m.key;
+          const pct = (m.value / maxVal) * 100;
+          return (
+            <div
+              key={m.key}
+              className="cursor-pointer"
+              onMouseEnter={() => setActiveBar(m.key)}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className={`text-[12px] font-extrabold transition-colors ${isActive ? '' : 'text-brand-navy'}`} style={isActive ? { color: m.color } : {}}>
+                  {m.label}
+                </span>
+                <span className="text-[12px] font-bold text-slate-600">
+                  <span className="font-extrabold" style={{ color: m.color }}>{String(m.value).replace(".", ",")}</span>
+                  <span className="text-[10px] text-slate-400 ml-1">{m.unit}</span>
+                </span>
+              </div>
+              <div className="h-3.5 rounded-full bg-slate-100 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${pct}%`,
+                    backgroundColor: m.color,
+                    opacity: activeBar && !isActive ? 0.3 : 1,
+                    boxShadow: isActive ? `0 0 8px ${m.color}66` : "none",
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
-      <div className="group flex items-start gap-3 rounded-xl border border-brand-border bg-[#F7FBFF] p-4 transition-all duration-300 hover:shadow-md cursor-pointer">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-green-50 text-brand-green transition-transform duration-300 group-hover:scale-110">
-          <Icon name="bolt" className="h-6 w-6" />
+
+      {/* Divider */}
+      <div className="border-t border-brand-border" />
+
+      {/* Insight card */}
+      <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-green-50 to-blue-50 border border-green-100 px-4 py-3">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-green-100 text-brand-green">
+          <Icon name="bolt" className="h-5 w-5" />
         </div>
-        <p className="text-sm font-semibold leading-relaxed text-brand-navy">
-          BEV memiliki siklus hidup emisi lebih rendah daripada ICE, tetapi manfaatnya meningkat signifikan jika bauran listrik makin bersih.
-        </p>
+        <div>
+          <p className="text-[11px] font-extrabold uppercase tracking-wide text-brand-green mb-0.5">Potensi Pengurangan Emisi</p>
+          <p className="text-[11px] font-medium leading-snug text-brand-navy">
+            Transisi ke BEV + energi terbarukan dapat memangkas emisi transportasi hingga <strong>67%</strong> pada 2040.
+          </p>
+        </div>
       </div>
+
+      {/* Floating tooltip */}
+      {activeBar && (() => {
+        const m = metrics.find(x => x.key === activeBar)!;
+        return (
+          <FloatingTooltip pos={pos}>
+            <p className="font-extrabold" style={{ color: m.color }}>{m.label}</p>
+            <p className="font-semibold text-slate-600">{m.value} {m.unit}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">{m.desc}</p>
+          </FloatingTooltip>
+        );
+      })()}
     </div>
   );
 }
@@ -715,23 +776,65 @@ function SmallMetric({ label, value, suffix, tone }: { label: string; value: str
 }
 
 function TargetPanel() {
+  const [activeRow, setActiveRow] = useState<string | null>(null);
+  const { pos, onMouseMove } = useCursorTooltip();
+
   const rows = [
-    { icon: "car", label: "Mobil listrik", value: "2.000.000", unit: "unit" },
-    { icon: "scooter", label: "Motor listrik", value: "12.900.000", unit: "unit" },
-    { icon: "battery", label: "Kapasitas sel baterai", value: "140", unit: "GWh" },
-    { icon: "factory", label: "Minimum TKDN industri BEV", value: "40%", unit: "(2025)" },
+    { icon: "car", label: "Mobil listrik", value: "2.000.000", rawValue: 2000000, max: 2000000, unit: "unit", color: BRAND.blue, desc: "Target kumulatif penjualan mobil BEV" },
+    { icon: "scooter", label: "Motor listrik", value: "12.900.000", rawValue: 12900000, max: 12900000, unit: "unit", color: BRAND.teal, desc: "Target kumulatif penjualan motor listrik" },
+    { icon: "battery", label: "Kapasitas sel baterai", value: "140 GWh", rawValue: 140, max: 140, unit: "GWh", color: BRAND.orange, desc: "Kapasitas produksi baterai lokal" },
+    { icon: "factory", label: "TKDN industri BEV", value: "40%", rawValue: 40, max: 100, unit: "%", color: BRAND.green, desc: "Minimum kandungan lokal (2025)" },
   ];
+
   return (
-    <div className="space-y-1">
-      {rows.map((row) => (
-        <div key={row.label} className="group flex items-center gap-3 border-b border-brand-border py-2 last:border-b-0 cursor-pointer transition-all duration-300 hover:bg-brand-soft px-2 rounded-lg -mx-2">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand-blue transition-colors group-hover:bg-brand-blue group-hover:text-white">
-            <Icon name={row.icon} className="h-5 w-5" />
+    <div className="flex h-full flex-col gap-2.5 pt-1" onMouseMove={onMouseMove} onMouseLeave={() => setActiveRow(null)}>
+      {rows.map((row, idx) => {
+        const isActive = activeRow === row.label;
+        const pct = (row.rawValue / row.max) * 100;
+        return (
+          <div
+            key={row.label}
+            className={`group cursor-pointer rounded-2xl border transition-all duration-300 px-3 py-2.5 ${isActive ? 'border-transparent shadow-md' : 'border-brand-border hover:border-transparent hover:shadow-sm'}`}
+            style={{ backgroundColor: isActive ? `${row.color}14` : "white" }}
+            onMouseEnter={() => setActiveRow(row.label)}
+          >
+            <div className="flex items-center gap-3">
+              {/* Icon */}
+              <div
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl transition-all duration-300"
+                style={{ backgroundColor: isActive ? row.color : `${row.color}20`, color: isActive ? "white" : row.color }}
+              >
+                <Icon name={row.icon} className="h-5 w-5" />
+              </div>
+
+              {/* Label + Bar */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline justify-between mb-1.5">
+                  <p className="text-[11px] font-extrabold text-slate-600 truncate">{row.label}</p>
+                  <p className="font-heading text-lg font-black leading-none ml-2 shrink-0" style={{ color: row.color }}>{row.value}</p>
+                </div>
+                <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{ width: `${pct}%`, backgroundColor: row.color, boxShadow: isActive ? `0 0 6px ${row.color}88` : "none" }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="flex-1 text-sm font-semibold text-slate-700 transition-colors group-hover:text-brand-navy">{row.label}</p>
-          <p className="font-heading text-xl font-bold text-brand-blue transition-transform duration-300 group-hover:scale-105 origin-right">{row.value} <span className="font-sans text-xs text-brand-navy">{row.unit}</span></p>
-        </div>
-      ))}
+        );
+      })}
+
+      {activeRow && (() => {
+        const row = rows.find(r => r.label === activeRow)!;
+        return (
+          <FloatingTooltip pos={pos}>
+            <p className="font-extrabold" style={{ color: row.color }}>{row.label}</p>
+            <p className="font-semibold text-slate-600">Target: <span style={{ color: row.color }}>{row.value}</span></p>
+            <p className="text-[10px] text-slate-400 mt-0.5">{row.desc}</p>
+          </FloatingTooltip>
+        );
+      })()}
     </div>
   );
 }
@@ -739,18 +842,49 @@ function TargetPanel() {
 function JavaDistribution({ data }: { data: { name: string; value: number; color: string }[] }) {
   const [hover, setHover] = useState<any | null>(null);
   const { pos, onMouseMove } = useCursorTooltip();
+  const total = data.reduce((s, d) => s + d.value, 0);
 
   return (
-    <div className="flex h-full min-h-[205px] flex-col items-center justify-center gap-4 overflow-hidden" onMouseMove={onMouseMove}>
-      <div className="relative h-32 w-32 shrink-0 md:h-36 md:w-36">
-        <SvgDonut data={data} total={100} size={144} hole={0.6} onHover={setHover}>
+    <div className="flex h-full flex-col gap-3 pt-1" onMouseMove={onMouseMove}>
+      {/* Donut */}
+      <div className="flex items-center justify-center">
+        <SvgDonut data={data} total={total} size={148} hole={0.6} onHover={setHover}>
           <div className="flex flex-col items-center justify-center rounded-full bg-white h-20 w-20 shadow-panel z-10 pointer-events-none">
-            <Icon name="pin" className={`h-8 w-8 transition-all duration-300 ${hover ? 'text-brand-blue scale-110' : 'text-slate-300'}`} />
+            {hover ? (
+              <>
+                <p className="font-heading text-[22px] font-bold leading-none" style={{ color: hover.color }}>{String(hover.value).replace(".", ",")}%</p>
+                <p className="text-[9px] font-bold text-slate-400 mt-0.5 text-center px-1 leading-tight">{hover.name}</p>
+              </>
+            ) : (
+              <Icon name="pin" className="h-9 w-9 text-slate-300" />
+            )}
           </div>
         </SvgDonut>
       </div>
 
-      <div className="grid w-full grid-cols-2 gap-2 relative z-10">
+      {/* Stacked bar */}
+      <div className="px-1">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Distribusi SPKLU</p>
+        <div className="flex h-3 w-full rounded-full overflow-hidden">
+          {data.map((d) => (
+            <div
+              key={d.name}
+              className="h-full transition-all duration-300 cursor-pointer"
+              style={{
+                width: `${d.value}%`,
+                backgroundColor: d.color,
+                opacity: hover && hover.name !== d.name ? 0.3 : 1,
+              }}
+              onMouseEnter={() => setHover(d)}
+              onMouseLeave={() => setHover(null)}
+              title={d.name}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Legend cards */}
+      <div className="grid grid-cols-2 gap-1.5">
         {data.map((item) => {
           const isHovered = hover?.name === item.name;
           return (
@@ -758,11 +892,14 @@ function JavaDistribution({ data }: { data: { name: string; value: number; color
               key={item.name}
               onMouseEnter={() => setHover(item)}
               onMouseLeave={() => setHover(null)}
-              className={`rounded-xl border border-brand-border bg-[#F8FBFF] px-2 py-2 text-center transition-all duration-300 cursor-pointer ${isHovered ? 'ring-2 ring-brand-blue/30 border-brand-blue scale-105 shadow-md' : hover ? 'opacity-50 grayscale' : 'hover:-translate-y-1 hover:shadow-md'}`}
+              className={`rounded-xl border px-2.5 py-2 transition-all duration-300 cursor-pointer ${isHovered ? 'shadow-md border-transparent scale-105' : 'border-brand-border hover:shadow-sm'}`}
+              style={{ backgroundColor: isHovered ? `${item.color}18` : "white" }}
             >
-              <div className="mx-auto mb-1 h-2.5 w-8 rounded-full" style={{ backgroundColor: item.color }} />
-              <p className="text-xs font-extrabold leading-tight text-brand-navy">{item.name}</p>
-              <p className="font-heading text-[26px] font-bold leading-none text-brand-blue">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                <p className="text-[10px] font-extrabold text-brand-navy truncate">{item.name}</p>
+              </div>
+              <p className="font-heading text-[22px] font-black leading-none" style={{ color: item.color }}>
                 {String(item.value).replace(".", ",")}%
               </p>
             </div>
@@ -782,27 +919,80 @@ function JavaDistribution({ data }: { data: { name: string; value: number; color
 }
 
 function TensionPanel() {
+  const [activeItem, setActiveItem] = useState<number | null>(null);
   const tensions = [
-    { no: 1, tone: "blue", title: "EV tumbuh cepat", text: "vs infrastruktur belum merata", icon: "trend" },
-    { no: 2, tone: "orange", title: "EV lebih rendah emisi", text: "vs listrik masih tinggi karbon", icon: "emission" },
-    { no: 3, tone: "teal", title: "Ambisi industri naik", text: "vs kebutuhan teknologi baterai", icon: "battery" },
+    {
+      no: 1, tone: "blue", icon: "trend",
+      left: { label: "EV Tumbuh", value: "104K", sub: "unit/2025", color: BRAND.blue },
+      right: { label: "Rasio SPKLU", value: "1:43", sub: "EV per SPKLU", color: "#64748b" },
+      insight: "Pertumbuhan penjualan EV masih jauh melampaui kecepatan pembangunan infrastruktur pengisian daya.",
+    },
+    {
+      no: 2, tone: "orange", icon: "emission",
+      left: { label: "Emisi BEV", value: "33%", sub: "vs ICE sejenis", color: BRAND.green },
+      right: { label: "Emisi Grid", value: "0,68", sub: "kgCO₂e/kWh", color: BRAND.orange },
+      insight: "BEV lebih bersih, namun manfaatnya terbatas selama listrik masih bergantung pada batubara.",
+    },
+    {
+      no: 3, tone: "teal", icon: "battery",
+      left: { label: "Target TKDN", value: "40%", sub: "komponen lokal", color: BRAND.teal },
+      right: { label: "Baterai Impor", value: ">80%", sub: "saat ini", color: BRAND.orange },
+      insight: "Ambisi industri EV lokal bergantung pada kemampuan produksi sel baterai yang masih terbatas.",
+    },
   ];
+
+  const toneConfig = {
+    blue: { bg: "bg-blue-50", border: "border-blue-200", badge: "bg-brand-blue", text: "text-brand-blue" },
+    orange: { bg: "bg-orange-50", border: "border-orange-200", badge: "bg-brand-orange", text: "text-brand-orange" },
+    teal: { bg: "bg-cyan-50", border: "border-cyan-200", badge: "bg-brand-teal", text: "text-brand-teal" },
+  };
+
   return (
     <div className="grid h-full min-h-[205px] gap-2.5">
       {tensions.map((item) => {
-        const accent = item.tone === "orange" ? "border-orange-200 bg-orange-50 text-brand-orange" : item.tone === "teal" ? "border-cyan-200 bg-cyan-50 text-brand-teal" : "border-blue-200 bg-blue-50 text-brand-blue";
-        const numberBg = item.tone === "orange" ? "bg-brand-orange" : item.tone === "teal" ? "bg-brand-teal" : "bg-brand-blue";
+        const cfg = toneConfig[item.tone as keyof typeof toneConfig];
+        const isActive = activeItem === item.no;
         return (
-          <div key={item.no} className={`group flex min-h-[62px] items-center gap-3 rounded-xl border px-3 py-2.5 transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-md ${accent}`}>
-            <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${numberBg} text-sm font-extrabold text-white shadow-panel transition-transform duration-300 group-hover:scale-110`}>
-              {item.no}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-extrabold leading-tight">{item.title}</p>
-              <p className="mt-0.5 text-xs font-semibold leading-snug text-brand-navy">{item.text}</p>
+          <div
+            key={item.no}
+            className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer ${isActive ? `${cfg.border} shadow-md` : `border-brand-border hover:${cfg.border} hover:shadow-sm`}`}
+            style={{ backgroundColor: isActive ? undefined : "white" }}
+            onMouseEnter={() => setActiveItem(item.no)}
+            onMouseLeave={() => setActiveItem(null)}
+          >
+            {/* Gradient bg on hover */}
+            <div className={`absolute inset-0 transition-opacity duration-300 ${cfg.bg} ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+
+            <div className="relative flex items-center gap-3 px-3 py-2.5">
+              {/* Badge */}
+              <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${cfg.badge} text-xs font-extrabold text-white shadow-sm transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}>
+                {item.no}
+              </span>
+
+              {/* Metric pair (VS layout) */}
+              <div className="flex flex-1 items-center gap-2 min-w-0">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">{item.left.label}</p>
+                  <p className="font-heading text-[20px] font-black leading-none" style={{ color: item.left.color }}>{item.left.value}</p>
+                  <p className="text-[9px] text-slate-400">{item.left.sub}</p>
+                </div>
+                <div className={`text-[11px] font-black ${cfg.text} shrink-0`}>VS</div>
+                <div className="flex-1 min-w-0 text-right">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">{item.right.label}</p>
+                  <p className="font-heading text-[20px] font-black leading-none" style={{ color: item.right.color }}>{item.right.value}</p>
+                  <p className="text-[9px] text-slate-400">{item.right.sub}</p>
+                </div>
+              </div>
+
+              {/* Icon */}
+              <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-all duration-300 ${isActive ? `${cfg.badge} text-white` : 'bg-slate-100 text-slate-400'}`}>
+                <Icon name={item.icon} className="h-5 w-5" />
+              </div>
             </div>
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/70 text-current transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-              <Icon name={item.icon} className="h-7 w-7" />
+
+            {/* Expandable insight */}
+            <div className={`relative overflow-hidden transition-all duration-300 ${isActive ? 'max-h-10' : 'max-h-0'}`}>
+              <p className={`px-3 pb-2.5 text-[11px] font-medium leading-snug ${cfg.text}`}>{item.insight}</p>
             </div>
           </div>
         );
