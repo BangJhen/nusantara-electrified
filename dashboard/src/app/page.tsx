@@ -65,23 +65,29 @@ type ConnectorRecord = {
 };
 
 const BRAND = {
-  navy: "#081D57",
-  blue: "#1267D8",
-  blueDark: "#0B4FB4",
-  orange: "#FF6B00",
-  teal: "#12B6C8",
-  green: "#2F8F46",
-  gray: "#7A8CAA",
-  border: "#D8E5F3",
-  soft: "#EAF3FF",
+  navy:   "#1e1b4b",
+  blue:   "#4f46e5",
+  blue2:  "#6366f1",
+  violet: "#7c3aed",
+  sky:    "#0ea5e9",
+  teal:   "#14b8a6",
+  green:  "#10b981",
+  amber:  "#f59e0b",
+  rose:   "#f43f5e",
+  orange: "#f97316",
+  gray:   "#6b7280",
+  border: "#E8EAFB",
+  soft:   "#EEF0FD",
+  // Keep legacy aliases
+  blueDark: "#4338ca",
 };
 
 const operatorColors = [
   BRAND.blue,
   BRAND.teal,
-  "#6F4EB8",
+  BRAND.violet,
   BRAND.orange,
-  "#91A4C4",
+  "#94a3b8",
 ];
 
 const javaProvinceNames = new Set([
@@ -165,7 +171,7 @@ export default function Home() {
 
   const javaDistribution = [
     { name: "Jawa", value: 78.9, color: BRAND.blue },
-    { name: "Luar Jawa", value: 21.1, color: BRAND.teal },
+    { name: "Luar Jawa", value: 21.1, color: BRAND.sky },
   ];
 
   function refreshData() {
@@ -179,7 +185,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F9FF] text-brand-navy">
+    <div className="min-h-screen bg-[#F8F9FE] text-brand-navy">
       <Topbar />
 
       <main className="mx-auto max-w-[1760px] p-3 lg:p-4">
@@ -230,19 +236,19 @@ export default function Home() {
             </section>
 
             <section className="grid grid-cols-1 gap-3 xl:grid-cols-12">
-              <Panel className="xl:col-span-4" title="Akselerasi Penjualan BEV">
+              <Panel className="xl:col-span-4" accentColor={BRAND.blue} title="Akselerasi Penjualan BEV">
                 <div className="h-[310px]">
                   <GrowthChart data={filteredBev} />
                 </div>
               </Panel>
 
-              <Panel className="xl:col-span-5" title="Sebaran SPKLU">
+              <Panel className="xl:col-span-5" accentColor={BRAND.sky} title="Sebaran SPKLU">
                 <div className="grid h-[310px] grid-cols-1 gap-4 md:grid-cols-[1.45fr_1fr]">
-                  <div className="overflow-hidden rounded-2xl border border-brand-border bg-[#F5F9FF] shadow-inner relative">
+                  <div className="overflow-hidden rounded-2xl border border-brand-border bg-[#F8F9FE] shadow-inner relative">
                     <SpkluMap selectedProvince={selectedProvince} />
                   </div>
                   <div className="flex min-h-0 flex-col gap-2.5">
-                    <div className="rounded-xl bg-blue-50/80 border border-blue-100 px-3 py-2 flex gap-2.5 items-start shadow-sm">
+                    <div className="rounded-xl bg-indigo-50/80 border border-indigo-100 px-3 py-2 flex gap-2.5 items-start shadow-sm">
                       <div className="mt-0.5 text-brand-blue">
                          <Icon name="pin" className="h-4 w-4" />
                       </div>
@@ -269,48 +275,48 @@ export default function Home() {
                 </div>
               </Panel>
 
-              <Panel className="xl:col-span-3" title="Ekosistem Operator SPKLU">
+              <Panel className="xl:col-span-3" accentColor={BRAND.violet} title="Ekosistem Operator SPKLU">
                 <div className="h-[310px]">
                   <OperatorDonut data={operatorDonutData} total={totalSpklu} />
                 </div>
               </Panel>
 
-              <Panel className="xl:col-span-3" title="Listrik & Emisi">
+              <Panel className="xl:col-span-3" accentColor={BRAND.green} title="Listrik & Emisi">
                 <EmissionPanel />
               </Panel>
 
-              <Panel className="xl:col-span-3" title="Target Nasional 2030">
+              <Panel className="xl:col-span-3" accentColor={BRAND.amber} title="Target Nasional 2030">
                 <TargetPanel />
               </Panel>
 
-              <Panel className="xl:col-span-2" title="Distribusi Pengisian Daya">
+              <Panel className="xl:col-span-2" accentColor={BRAND.sky} title="Distribusi Pengisian Daya">
                 <JavaDistribution data={javaDistribution} />
               </Panel>
 
-              <Panel className="xl:col-span-4" title="3 Ketegangan Utama Ekosistem EV Indonesia">
+              <Panel className="xl:col-span-4" accentColor={BRAND.rose} title="3 Ketegangan Utama Ekosistem EV Indonesia">
                 <TensionPanel />
               </Panel>
 
-              <Panel className="xl:col-span-6" contentClassName="flex flex-col" title="Jenis Konektor SPKLU">
+              <Panel className="xl:col-span-6" contentClassName="flex flex-col" accentColor={BRAND.blue} title="Jenis Konektor SPKLU">
                 <ConnectorPanel data={connectorData} total={totalConnectors} />
               </Panel>
 
-              <Panel className="xl:col-span-6" contentClassName="flex flex-col" title="RUPTL 2025–2034: Kapasitas Baru">
+              <Panel className="xl:col-span-6" contentClassName="flex flex-col" accentColor={BRAND.green} title="RUPTL 2025–2034: Kapasitas Baru">
                 <RupltPanel />
               </Panel>
             </section>
 
             {/* ── Tren, Tantangan & Kesiapan Ekosistem ── */}
             <section className="mt-3 grid grid-cols-1 gap-3 xl:grid-cols-12 items-stretch">
-              <Panel className="xl:col-span-4" contentClassName="flex flex-col" title="Kesiapan Ekosistem EV Indonesia">
+              <Panel className="xl:col-span-4" contentClassName="flex flex-col" accentColor={BRAND.violet} title="Kesiapan Ekosistem EV Indonesia">
                 <EcosystemRadar />
               </Panel>
 
-              <Panel className="xl:col-span-5" contentClassName="flex flex-col" title="Roadmap & Milestone Kebijakan EV">
+              <Panel className="xl:col-span-5" contentClassName="flex flex-col" accentColor={BRAND.teal} title="Roadmap & Milestone Kebijakan EV">
                 <PolicyTimeline />
               </Panel>
 
-              <Panel className="xl:col-span-3" title="Perbandingan Global EV">
+              <Panel className="xl:col-span-3" accentColor={BRAND.sky} title="Perbandingan Global EV">
                 <GlobalComparison />
               </Panel>
             </section>
@@ -325,17 +331,22 @@ export default function Home() {
 
 function Topbar() {
   return (
-    <header className="flex h-[86px] items-center justify-between border-b border-brand-border bg-white px-4 lg:px-6">
+    <header className="flex h-[76px] items-center justify-between border-b border-brand-border bg-white/90 backdrop-blur-sm px-4 lg:px-6 sticky top-0 z-40 shadow-sm">
       <img
         src="/Logo%20EV%20Indonesia.png"
         alt="Nusantara Electrified — EV Indonesia"
-        className="h-[60px] w-auto object-contain"
+        className="h-[55px] w-auto object-contain"
       />
+
+      <div className="hidden xl:flex items-center gap-2 px-4 py-2 rounded-full bg-brand-soft border border-brand-border">
+        <span className="h-2 w-2 rounded-full bg-brand-green animate-pulse" />
+        <span className="text-[11px] font-bold text-brand-navy uppercase tracking-widest">Data Live · 2025</span>
+      </div>
 
       <img
         src="/Header%20Satria%20Data.png"
         alt="Satria Data — Puspresnas, BPTI, Kampus Merdeka"
-        className="hidden h-[60px] w-auto object-contain xl:block"
+        className="hidden h-[55px] w-auto object-contain xl:block"
       />
     </header>
   );
@@ -384,43 +395,50 @@ function KpiCard({
   suffix: string;
   color: "blue" | "orange" | "teal" | "green";
 }) {
-  const colorText = {
-    blue: "text-brand-blue",
-    orange: "text-brand-orange",
-    teal: "text-brand-teal",
-    green: "text-brand-green",
-  }[color];
-
-  const colorBorderHover = {
-    blue: "hover:border-blue-400",
-    orange: "hover:border-orange-400",
-    teal: "hover:border-teal-400",
-    green: "hover:border-green-400",
+  const palette = {
+    blue:   { from: "#ede9fe", to: "#e0e7ff", text: BRAND.blue,   ring: "#818cf8" },
+    orange: { from: "#fff7ed", to: "#fef3c7", text: BRAND.orange, ring: "#fb923c" },
+    teal:   { from: "#f0fdfa", to: "#d1fae5", text: BRAND.teal,  ring: "#2dd4bf" },
+    green:  { from: "#ecfdf5", to: "#d1fae5", text: BRAND.green,  ring: "#34d399" },
   }[color];
 
   return (
-    <article className={`group relative flex min-h-[120px] flex-col justify-center gap-1 overflow-hidden rounded-2xl border border-brand-border bg-white p-5 shadow-panel transition-all duration-300 hover:-translate-y-1 hover:shadow-card ${colorBorderHover}`}>
-      {/* Decorative large icon on the background */}
-      <div className={`absolute -right-4 -top-4 opacity-[0.04] transition-transform duration-500 group-hover:scale-125 group-hover:-rotate-6 ${colorText}`}>
-        <Icon name={icon} className="h-32 w-32" />
-      </div>
+    <article
+      className="group relative flex min-h-[128px] flex-col justify-between overflow-hidden rounded-2xl border border-brand-border bg-white p-5 shadow-panel transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
+      style={{ borderTopColor: palette.text, borderTopWidth: 3 }}
+    >
+      {/* Soft gradient orb */}
+      <div
+        className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-60 transition-all duration-500 group-hover:scale-125 group-hover:opacity-80"
+        style={{ background: `radial-gradient(circle, ${palette.from}, ${palette.to})` }}
+      />
 
-      <div className="relative z-10 flex items-start justify-between mb-1 gap-2">
-        <p className="text-xs font-bold text-slate-600 tracking-wide uppercase leading-snug">{label}</p>
-        <div className={`shrink-0 ${colorText} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 drop-shadow-sm`}>
-          <Icon name={icon} className="h-7 w-7" />
+      {/* Icon chip */}
+      <div className="relative z-10 flex items-start justify-between">
+        <div
+          className="grid h-10 w-10 place-items-center rounded-xl shadow-sm transition-transform duration-300 group-hover:scale-110"
+          style={{ backgroundColor: palette.from, color: palette.text }}
+        >
+          <Icon name={icon} className="h-5 w-5" />
         </div>
-      </div>
-      
-      <div className="relative z-10 mt-auto flex items-baseline gap-2">
-        <span className={`font-heading text-[32px] font-black leading-none tracking-tight ${colorText}`}>
-          {value}
+        <span
+          className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-full"
+          style={{ backgroundColor: `${palette.text}18`, color: palette.text }}
+        >
+          {color === "blue" ? "EV" : color === "orange" ? "TREND" : color === "teal" ? "INFRA" : "ECO"}
         </span>
       </div>
-      
-      {suffix && (
-        <p className="relative z-10 text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-wider">{suffix}</p>
-      )}
+
+      {/* Value */}
+      <div className="relative z-10">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400 mb-1 leading-none">{label}</p>
+        <span className="font-heading text-[30px] font-black leading-none" style={{ color: palette.text }}>
+          {value}
+        </span>
+        {suffix && (
+          <p className="text-[10px] font-semibold text-slate-400 mt-1">{suffix}</p>
+        )}
+      </div>
     </article>
   );
 }
@@ -430,16 +448,24 @@ function Panel({
   children,
   className = "",
   contentClassName = "",
+  accentColor,
 }: {
   title: string;
   children: ReactNode;
   className?: string;
   contentClassName?: string;
+  accentColor?: string;
 }) {
   return (
     <article className={`dashboard-panel flex flex-col min-h-0 ${className}`}>
-      <div className="flex items-center justify-between border-b border-brand-border px-5 py-3 shrink-0">
-        <h2 className="font-heading text-lg font-bold tracking-wide text-brand-navy">{title}</h2>
+      <div
+        className="flex items-center gap-3 border-b border-brand-border px-5 py-3.5 shrink-0"
+        style={accentColor ? { borderLeftColor: accentColor, borderLeftWidth: 3 } : {}}
+      >
+        {accentColor && (
+          <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: accentColor }} />
+        )}
+        <h2 className="font-heading text-[13px] font-bold tracking-widest text-brand-navy">{title}</h2>
       </div>
       <div className={`p-4 flex-1 min-h-0 ${contentClassName}`}>{children}</div>
     </article>
