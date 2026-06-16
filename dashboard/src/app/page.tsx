@@ -506,13 +506,20 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
         {data.map((item, index) => {
           if (item.growth_yoy_pct === null) return null;
           const x = xFor(index);
-          const y = yGrowth(item.growth_yoy_pct);
+          const yG = yGrowth(item.growth_yoy_pct);
+          const yU = yUnits(item.bev_wholesales_units);
+          
+          // Deteksi jika label oranye (yang biasanya di atas titik) akan menabrak label bar (biru) atau terlalu dekat ke atap
+          const isOverlap = Math.abs(yG - yU) < 50 || yG < top + 35;
+          const rectY = isOverlap ? yG + 12 : yG - 34;
+          const textY = isOverlap ? yG + 27 : yG - 19;
+          
           const label = `${String(item.growth_yoy_pct).replace(".", ",")}%`;
           return (
             <g key={`growth-${item.year}`} onMouseEnter={() => setHover(item)} onMouseLeave={() => setHover(null)} className="cursor-pointer">
-              <circle cx={x} cy={y} r="5" fill={BRAND.orange} stroke="#fff" strokeWidth="3" />
-              <rect x={x - 31} y={y - 34} width="62" height="22" rx="7" fill="#fff" stroke={BRAND.orange} />
-              <text x={x} y={y - 19} textAnchor="middle" fontSize="11" fontWeight="800" fill={BRAND.orange}>{label}</text>
+              <circle cx={x} cy={yG} r="5" fill={BRAND.orange} stroke="#fff" strokeWidth="3" />
+              <rect x={x - 31} y={rectY} width="62" height="22" rx="7" fill="#fff" stroke={BRAND.orange} />
+              <text x={x} y={textY} textAnchor="middle" fontSize="11" fontWeight="800" fill={BRAND.orange}>{label}</text>
             </g>
           );
         })}
@@ -749,7 +756,7 @@ function ConnectorPanel({ data, total }: { data: ConnectorRecord[]; total: numbe
           >
             <div className="mb-1 flex items-center justify-between text-xs font-bold text-brand-navy">
               <span className="transition-colors group-hover:text-brand-blue">{item.connector_type}</span>
-              <span className="transition-colors group-hover:text-brand-blue">{formatId(item.count)} • {pct.toFixed(1).replace(".", ",")}%</span>
+              <span className="transition-colors group-hover:text-brand-blue">{formatId(item.count)}</span>
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-brand-soft">
               <div className="h-full rounded-full transition-all duration-300 group-hover:brightness-110" style={{ width: `${pct}%`, backgroundColor: colors[index] }} />
