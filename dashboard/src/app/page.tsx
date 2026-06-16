@@ -300,6 +300,21 @@ export default function Home() {
               </Panel>
             </section>
 
+            {/* ── Tren, Tantangan & Kesiapan Ekosistem ── */}
+            <section className="mt-3 grid grid-cols-1 gap-3 xl:grid-cols-12">
+              <Panel className="xl:col-span-4" title="Kesiapan Ekosistem EV Indonesia">
+                <EcosystemRadar />
+              </Panel>
+
+              <Panel className="xl:col-span-5" title="Roadmap & Milestone Kebijakan EV">
+                <PolicyTimeline />
+              </Panel>
+
+              <Panel className="xl:col-span-3" title="Perbandingan Global EV">
+                <GlobalComparison />
+              </Panel>
+            </section>
+
             <section className="mt-3">
               <FooterBanner />
             </section>
@@ -1173,6 +1188,266 @@ function SvgDonut({
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         {children}
       </div>
+    </div>
+  );
+}
+
+// ─── Kesiapan Ekosistem EV (Radar / Spider Chart) ────────────────────────────
+function EcosystemRadar() {
+  const [hover, setHover] = useState<number | null>(null);
+  const { pos, onMouseMove } = useCursorTooltip();
+
+  const axes = [
+    { label: "Penjualan EV", score: 72, color: BRAND.blue, icon: "car", desc: "Pertumbuhan penjualan BEV mencapai 104K unit di 2025 (+800x dari 2020)" },
+    { label: "Infrastruktur SPKLU", score: 38, color: BRAND.teal, icon: "charging-station", desc: "2.426 SPKLU tersedia, namun rasio 1:43 EV per SPKLU masih sangat rendah" },
+    { label: "Kebijakan & Regulasi", score: 65, color: BRAND.orange, icon: "factory", desc: "Target 2030 sudah ada, insentif fiskal aktif, namun implementasi belum konsisten" },
+    { label: "Bauran Energi Bersih", score: 29, color: BRAND.green, icon: "bolt", desc: "Grid listrik masih 67% fosil, mengurangi manfaat lingkungan BEV" },
+    { label: "Industri Lokal & Baterai", score: 44, color: "#6F4EB8", icon: "battery", desc: "TKDN target 40%, tetapi sel baterai masih 80%+ impor" },
+    { label: "Adopsi Publik", score: 55, color: BRAND.gray, icon: "scooter", desc: "Kesadaran meningkat, harga premium masih jadi hambatan utama" },
+  ];
+
+  const N = axes.length;
+  const cx = 140, cy = 140, R = 105;
+  const levels = [0.25, 0.5, 0.75, 1.0];
+
+  const angleOf = (i: number) => (Math.PI * 2 * i) / N - Math.PI / 2;
+  const pointAt = (i: number, r: number) => ({
+    x: cx + r * Math.cos(angleOf(i)),
+    y: cy + r * Math.sin(angleOf(i)),
+  });
+
+  // Polygon area for data
+  const dataPoints = axes.map((a, i) => pointAt(i, R * (a.score / 100)));
+  const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z";
+
+  // Grid lines
+  const gridPolygons = levels.map((lvl) =>
+    axes.map((_, i) => pointAt(i, R * lvl)).map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z"
+  );
+
+  return (
+    <div className="flex gap-3" onMouseMove={onMouseMove} onMouseLeave={() => setHover(null)}>
+      {/* SVG Radar */}
+      <div className="relative shrink-0">
+        <svg width="280" height="280" viewBox="0 0 280 280">
+          {/* Grid polygons */}
+          {gridPolygons.map((d, li) => (
+            <path key={li} d={d} fill="none" stroke={BRAND.border} strokeWidth="1" strokeDasharray={li < 3 ? "3 3" : "none"} />
+          ))}
+          {/* Axis spokes */}
+          {axes.map((_, i) => {
+            const end = pointAt(i, R);
+            return <line key={i} x1={cx} y1={cy} x2={end.x} y2={end.y} stroke={BRAND.border} strokeWidth="1" />;
+          })}
+          {/* Data polygon */}
+          <path d={dataPath} fill={`${BRAND.blue}22`} stroke={BRAND.blue} strokeWidth="2.5" strokeLinejoin="round" />
+          {/* Data points (dots) */}
+          {dataPoints.map((p, i) => {
+            const isHov = hover === i;
+            return (
+              <circle
+                key={i}
+                cx={p.x} cy={p.y} r={isHov ? 7 : 5}
+                fill={isHov ? axes[i].color : "white"}
+                stroke={axes[i].color}
+                strokeWidth="2.5"
+                className="cursor-pointer transition-all duration-200"
+                onMouseEnter={() => setHover(i)}
+              />
+            );
+          })}
+          {/* Axis labels */}
+          {axes.map((a, i) => {
+            const lp = pointAt(i, R + 18);
+            const isHov = hover === i;
+            return (
+              <text
+                key={i}
+                x={lp.x} y={lp.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="9.5"
+                fontWeight={isHov ? "800" : "600"}
+                fill={isHov ? a.color : BRAND.navy}
+                className="cursor-pointer transition-all duration-200"
+                onMouseEnter={() => setHover(i)}
+              >
+                {a.label}
+              </text>
+            );
+          })}
+          {/* Center score */}
+          <text x={cx} y={cy - 8} textAnchor="middle" fontSize="20" fontWeight="900" fill={BRAND.navy}>
+            {Math.round(axes.reduce((s, a) => s + a.score, 0) / axes.length)}
+          </text>
+          <text x={cx} y={cy + 10} textAnchor="middle" fontSize="9" fontWeight="600" fill={BRAND.gray}>/ 100</text>
+        </svg>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-col justify-center gap-2 flex-1 min-w-0">
+        {axes.map((a, i) => (
+          <div
+            key={i}
+            className={`cursor-pointer rounded-xl px-2.5 py-2 transition-all duration-200 border ${hover === i ? 'border-transparent shadow-md' : 'border-brand-border hover:shadow-sm'}`}
+            style={{ backgroundColor: hover === i ? `${a.color}14` : "white" }}
+            onMouseEnter={() => setHover(i)}
+            onMouseLeave={() => setHover(null)}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] font-extrabold truncate" style={{ color: hover === i ? a.color : BRAND.navy }}>{a.label}</span>
+              <span className="text-[11px] font-black ml-1 shrink-0" style={{ color: a.color }}>{a.score}</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${a.score}%`, backgroundColor: a.color }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {hover !== null && (
+        <FloatingTooltip pos={pos}>
+          <p className="font-extrabold" style={{ color: axes[hover].color }}>{axes[hover].label}</p>
+          <p className="font-black text-lg" style={{ color: axes[hover].color }}>{axes[hover].score}<span className="text-xs font-normal text-slate-400">/100</span></p>
+          <p className="text-[10px] text-slate-500 mt-1 max-w-[200px] leading-snug">{axes[hover].desc}</p>
+        </FloatingTooltip>
+      )}
+    </div>
+  );
+}
+
+// ─── Policy Timeline ──────────────────────────────────────────────────────────
+function PolicyTimeline() {
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+  const milestones = [
+    { year: "2019", tone: "blue", icon: "car", title: "Perpres No. 55/2019", desc: "Landasan hukum pengembangan kendaraan bermotor listrik berbasis baterai (KBL-BB) ditetapkan." },
+    { year: "2021", tone: "teal", icon: "factory", title: "Insentif Impor EV", desc: "Pemerintah beri keringanan bea masuk & PPnBM 0% untuk impor KBL-BB demi menarik merek global." },
+    { year: "2022", tone: "orange", icon: "bolt", title: "Konversi Motor Listrik", desc: "Program subsidi konversi motor BBM ke listrik senilai Rp7 juta/unit diluncurkan secara nasional." },
+    { year: "2023", tone: "blue", icon: "charging-station", title: "Subsidi BEV Rp7 Juta", desc: "Subsidi pembelian motor listrik Rp7 juta dan mobil listrik PPN 1% diberlakukan untuk dorong adopsi." },
+    { year: "2024", tone: "green", icon: "battery", title: "Hilirisasi Nikel-Baterai", desc: "Investasi >USD 15 miliar masuk ke ekosistem baterai, dari tambang nikel hingga produksi sel baterai." },
+    { year: "2025", tone: "orange", icon: "trend", title: "Target TKDN 40%", desc: "Komponen lokal wajib mencapai 40% pada akhir 2025 sebagai syarat kelayakan insentif produsen EV." },
+    { year: "2030", tone: "teal", icon: "leaf-shield", title: "Target 2 Juta EV", desc: "Peta jalan: 2 juta mobil dan 12,9 juta motor listrik mengaspal demi net zero emission 2060." },
+  ];
+
+  const toneMap: Record<string, { bg: string; border: string; text: string; dot: string }> = {
+    blue: { bg: "bg-blue-50", border: "border-blue-200", text: "text-brand-blue", dot: "bg-brand-blue" },
+    orange: { bg: "bg-orange-50", border: "border-orange-200", text: "text-brand-orange", dot: "bg-brand-orange" },
+    teal: { bg: "bg-cyan-50", border: "border-cyan-200", text: "text-brand-teal", dot: "bg-brand-teal" },
+    green: { bg: "bg-green-50", border: "border-green-200", text: "text-brand-green", dot: "bg-brand-green" },
+  };
+
+  return (
+    <div className="relative flex flex-col gap-0">
+      {/* Vertical axis line */}
+      <div className="absolute left-[52px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-brand-blue via-brand-teal to-brand-green rounded-full" />
+
+      {milestones.map((m, i) => {
+        const t = toneMap[m.tone];
+        const isActive = activeIdx === i;
+        return (
+          <div
+            key={i}
+            className={`group relative flex items-start gap-3 cursor-pointer py-2 px-1 rounded-xl transition-all duration-300 ${isActive ? `${t.bg}` : 'hover:bg-slate-50'}`}
+            onMouseEnter={() => setActiveIdx(i)}
+            onMouseLeave={() => setActiveIdx(null)}
+          >
+            {/* Year */}
+            <div className={`w-10 shrink-0 text-right text-[11px] font-black transition-colors duration-300 mt-0.5 ${isActive ? t.text : 'text-slate-400'}`}>
+              {m.year}
+            </div>
+
+            {/* Dot on the spine */}
+            <div className={`relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-2 border-white shadow transition-all duration-300 ${isActive ? t.dot + ' scale-125' : 'bg-slate-200'}`} />
+
+            {/* Content */}
+            <div className="flex-1 min-w-0 pb-1">
+              <p className={`text-[12px] font-extrabold leading-tight transition-colors duration-300 ${isActive ? t.text : 'text-brand-navy'}`}>{m.title}</p>
+              <div className={`overflow-hidden transition-all duration-300 ${isActive ? 'max-h-20 mt-1' : 'max-h-0'}`}>
+                <p className="text-[11px] font-medium leading-snug text-slate-500">{m.desc}</p>
+              </div>
+            </div>
+
+            {/* Icon badge */}
+            <div className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg transition-all duration-300 ${isActive ? t.dot + ' text-white' : 'bg-slate-100 text-slate-400'}`}>
+              <Icon name={m.icon} className="h-4 w-4" />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Global Comparison ───────────────────────────────────────────────────────
+function GlobalComparison() {
+  const [hover, setHover] = useState<number | null>(null);
+  const { pos, onMouseMove } = useCursorTooltip();
+
+  const countries = [
+    { flag: "🇨🇳", name: "Tiongkok", evShare: 35, spklu: 9200000, bevSales: 9400000, color: "#E63946", tier: "Terdepan" },
+    { flag: "🇳🇴", name: "Norwegia", evShare: 82, spklu: 25000, bevSales: 130000, color: "#457B9D", tier: "Terdepan" },
+    { flag: "🇩🇪", name: "Jerman", evShare: 18, spklu: 100000, bevSales: 670000, color: "#2D6A4F", tier: "Maju" },
+    { flag: "🇺🇸", name: "Amerika", evShare: 9, spklu: 170000, bevSales: 1400000, color: "#1267D8", tier: "Maju" },
+    { flag: "🇮🇩", name: "Indonesia", evShare: 3.2, spklu: 2426, bevSales: 104000, color: "#FF6B00", tier: "Berkembang" },
+    { flag: "🇹🇭", name: "Thailand", evShare: 5.8, spklu: 8000, bevSales: 90000, color: "#6F4EB8", tier: "Berkembang" },
+  ];
+
+  const maxEvShare = Math.max(...countries.map(c => c.evShare));
+
+  return (
+    <div className="flex flex-col gap-2.5" onMouseMove={onMouseMove} onMouseLeave={() => setHover(null)}>
+      {/* Header */}
+      <div className="flex items-center gap-2 px-1 mb-1">
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide flex-1">Negara</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide w-20 text-right">Pangsa EV</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide w-14 text-right">Skor</span>
+      </div>
+
+      {countries.map((c, i) => {
+        const isHov = hover === i;
+        const isIndo = c.name === "Indonesia";
+        return (
+          <div
+            key={i}
+            className={`group rounded-2xl border px-3 py-2.5 cursor-pointer transition-all duration-300 ${isHov ? 'border-transparent shadow-md' : isIndo ? 'border-brand-orange/30 bg-orange-50/30' : 'border-brand-border hover:shadow-sm'}`}
+            style={{ backgroundColor: isHov ? `${c.color}12` : undefined }}
+            onMouseEnter={() => setHover(i)}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xl">{c.flag}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-[13px] font-extrabold ${isHov ? '' : 'text-brand-navy'}`} style={isHov ? { color: c.color } : {}}>
+                    {c.name}
+                  </span>
+                  {isIndo && <span className="text-[9px] font-bold bg-brand-orange text-white px-1.5 py-0.5 rounded-full">Kita</span>}
+                </div>
+                <span className={`text-[9px] font-bold rounded-full px-1.5 py-0.5 ${ c.tier === 'Terdepan' ? 'bg-green-100 text-green-700' : c.tier === 'Maju' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                  {c.tier}
+                </span>
+              </div>
+              <span className="text-[16px] font-black" style={{ color: c.color }}>{c.evShare}%</span>
+            </div>
+            {/* Bar */}
+            <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${(c.evShare / maxEvShare) * 100}%`, backgroundColor: c.color, boxShadow: isHov ? `0 0 8px ${c.color}66` : "none" }}
+              />
+            </div>
+          </div>
+        );
+      })}
+
+      {hover !== null && (
+        <FloatingTooltip pos={pos}>
+          <p className="font-extrabold" style={{ color: countries[hover].color }}>{countries[hover].flag} {countries[hover].name}</p>
+          <p className="font-semibold text-slate-600">Pangsa EV: <span style={{ color: countries[hover].color }}>{countries[hover].evShare}%</span></p>
+          <p className="font-semibold text-slate-600">SPKLU: <span className="text-brand-blue">{countries[hover].spklu.toLocaleString("id-ID")}</span></p>
+          <p className="font-semibold text-slate-600">Penjualan BEV: <span className="text-brand-teal">{countries[hover].bevSales.toLocaleString("id-ID")}</span></p>
+        </FloatingTooltip>
+      )}
     </div>
   );
 }
