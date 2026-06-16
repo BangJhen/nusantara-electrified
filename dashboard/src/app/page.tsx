@@ -585,11 +585,11 @@ function OperatorDonut({ data, total }: { data: { name: string; value: number; c
   return (
     <div className="flex h-full flex-col gap-3" onMouseMove={onMouseMove}>
       {/* Bagian atas: Donut + legenda horizontal */}
-      <div className="flex items-center gap-4 flex-1 min-h-0">
+      <div className="flex items-center gap-3 flex-1 min-h-0">
         {/* Donut */}
         <div className="shrink-0 grid place-items-center">
-          <SvgDonut data={data} total={total} size={185} hole={0.57} onHover={setHover}>
-            <div className="flex flex-col items-center justify-center rounded-full bg-white h-24 w-24 shadow-panel z-10 pointer-events-none">
+          <SvgDonut data={data} total={total} size={150} hole={0.58} onHover={setHover}>
+            <div className="flex flex-col items-center justify-center rounded-full bg-white h-20 w-20 shadow-panel z-10 pointer-events-none">
               {active ? (
                 <>
                   <div className="font-heading text-[22px] font-bold leading-none transition-all duration-300" style={{ color: active.color }}>{formatCompact(active.value)}</div>
@@ -608,7 +608,7 @@ function OperatorDonut({ data, total }: { data: { name: string; value: number; c
         </div>
 
         {/* Legend cards */}
-        <div className="flex-1 flex flex-col gap-2 min-h-0">
+        <div className="flex-1 flex flex-col justify-center gap-1.5 min-w-0">
           {data.map((item, index) => {
             const pct = (item.value / total) * 100;
             const barPct = (item.value / maxVal) * 100;
@@ -617,7 +617,7 @@ function OperatorDonut({ data, total }: { data: { name: string; value: number; c
             return (
               <div
                 key={item.name}
-                className={`group relative cursor-pointer rounded-xl border px-3 py-2 transition-all duration-300 ${
+                className={`group relative cursor-pointer rounded-xl border px-2.5 py-1.5 transition-all duration-300 ${
                   isActive
                     ? "border-transparent shadow-md scale-[1.02] origin-left"
                     : isDimmed
@@ -630,16 +630,16 @@ function OperatorDonut({ data, total }: { data: { name: string; value: number; c
                 onClick={() => handleClick(item)}
               >
                 {/* Header row */}
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                    <span className={`text-[11px] font-extrabold transition-colors ${isActive ? "text-brand-navy" : "text-brand-navy group-hover:text-brand-navy"}`}>
+                <div className="flex items-center justify-between mb-1 gap-1">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className={`text-[11px] font-extrabold truncate transition-colors ${isActive ? "text-brand-navy" : "text-brand-navy group-hover:text-brand-navy"}`}>
                       {item.name}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[11px] font-bold text-slate-500">{formatId(item.value)}</span>
-                    <span className={`text-[10px] font-extrabold rounded-full px-1.5 py-0.5 text-white`} style={{ backgroundColor: item.color }}>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-[10px] font-bold text-slate-500">{formatId(item.value)}</span>
+                    <span className={`text-[9px] font-extrabold rounded-full px-1.5 py-0.5 text-white`} style={{ backgroundColor: item.color }}>
                       {pct.toFixed(1).replace(".", ",")}%
                     </span>
                   </div>
@@ -956,11 +956,12 @@ function SvgDonut({
               cx={center}
               cy={center}
               r={r}
-              fill="transparent"
+              fill="none"
               stroke={item.color}
               strokeWidth={isHovered ? strokeWidth + 4 : strokeWidth}
               strokeDasharray={`${sliceLength} ${circumference - sliceLength}`}
               strokeDashoffset={dashOffset}
+              pointerEvents="stroke"
               className="cursor-pointer transition-all duration-200"
               style={{
                 filter: isHovered
