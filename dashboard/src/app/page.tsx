@@ -103,6 +103,7 @@ export default function Home() {
   const [region, setRegion] = useState("Semua Wilayah");
   const [lastUpdated, setLastUpdated] = useState("20 Mei 2025");
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -238,7 +239,7 @@ export default function Home() {
               <Panel className="xl:col-span-5" title="Sebaran SPKLU">
                 <div className="grid h-[310px] grid-cols-1 gap-4 md:grid-cols-[1.45fr_1fr]">
                   <div className="overflow-hidden rounded-2xl border border-brand-border bg-[#F5F9FF] shadow-inner relative">
-                    <SpkluMap />
+                    <SpkluMap selectedProvince={selectedProvince} />
                   </div>
                   <div className="flex min-h-0 flex-col gap-3">
                     <div className="rounded-xl bg-blue-50/80 border border-blue-100 p-3 flex gap-2.5 items-start shadow-sm">
@@ -257,7 +258,11 @@ export default function Home() {
                         <Icon name="trend" className="h-3.5 w-3.5 text-slate-300" />
                       </div>
                       <div className="min-h-0 flex-1">
-                        <ProvinceMiniBar data={visibleProvinceData} />
+                        <ProvinceMiniBar 
+                          data={visibleProvinceData} 
+                          selectedProvince={selectedProvince}
+                          onSelectProvince={setSelectedProvince}
+                        />
                       </div>
                     </div>
                   </div>
@@ -519,7 +524,15 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
   );
 }
 
-function ProvinceMiniBar({ data }: { data: ProvinceRecord[] }) {
+function ProvinceMiniBar({ 
+  data, 
+  selectedProvince,
+  onSelectProvince 
+}: { 
+  data: ProvinceRecord[];
+  selectedProvince?: string | null;
+  onSelectProvince?: (province: string | null) => void;
+}) {
   const [hover, setHover] = useState<ProvinceRecord | null>(null);
   const { pos, onMouseMove } = useCursorTooltip();
   const max = Math.max(1, ...data.map((item) => item.station_count));
@@ -528,19 +541,21 @@ function ProvinceMiniBar({ data }: { data: ProvinceRecord[] }) {
       {data.map((item, index) => {
         const pct = (item.station_count / max) * 100;
         const isTop3 = index < 3;
+        const isSelected = selectedProvince === item.province;
         const barColor = index === 0 ? "bg-brand-orange" : index === 1 ? "bg-brand-teal" : index === 2 ? "bg-brand-green" : "bg-brand-blue";
         return (
           <div
             key={item.province}
-            className="group grid grid-cols-[16px_86px_1fr_32px] items-center gap-2 text-[11px] font-bold text-brand-navy cursor-pointer"
+            className={`group grid grid-cols-[16px_86px_1fr_32px] items-center gap-2 text-[11px] font-bold cursor-pointer transition-all duration-200 ${isSelected ? 'bg-blue-50/70 -mx-1 px-1 py-0.5 rounded-lg text-brand-blue' : 'text-brand-navy hover:bg-slate-50/50 -mx-1 px-1 py-0.5 rounded-lg'}`}
             onMouseEnter={() => setHover(item)}
+            onClick={() => onSelectProvince?.(isSelected ? null : item.province)}
           >
             <span className={`text-[9px] text-center w-4 h-4 rounded-full flex items-center justify-center ${isTop3 ? barColor + ' text-white shadow-sm' : 'bg-slate-100 text-slate-400'}`}>{index + 1}</span>
-            <span className="leading-tight truncate group-hover:text-brand-blue transition-colors">{item.province}</span>
+            <span className={`leading-tight truncate transition-colors ${isSelected ? 'text-brand-blue' : 'group-hover:text-brand-blue'}`}>{item.province}</span>
             <div className="h-2 overflow-hidden rounded-full bg-slate-100">
               <div className={`h-full rounded-full transition-all duration-500 group-hover:brightness-110 ${barColor}`} style={{ width: `${pct}%` }} />
             </div>
-            <span className={`text-right group-hover:text-brand-blue transition-colors ${isTop3 ? 'text-brand-navy' : 'text-slate-500'}`}>{item.station_count}</span>
+            <span className={`text-right transition-colors ${isSelected ? 'text-brand-blue' : isTop3 ? 'text-brand-navy' : 'text-slate-500'} group-hover:text-brand-blue`}>{item.station_count}</span>
           </div>
         );
       })}

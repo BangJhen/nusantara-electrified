@@ -4,7 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-export default function SpkluMap() {
+const PROVINCE_COORDS: Record<string, [number, number]> = {
+  "DKI Jakarta": [106.8229, -6.1944],
+  "Jawa Barat": [107.6098, -6.9147],
+  "Jawa Timur": [112.7521, -7.2504],
+  "Jawa Tengah": [110.4227, -6.9666],
+  "Banten": [106.1503, -6.1200],
+  "Bali": [115.1889, -8.4095],
+  "Sumatera Utara": [99.0607, 2.1154],
+  "Kalimantan Timur": [116.4162, 0.5387],
+  "Sulawesi Selatan": [119.9740, -3.6687],
+  "Riau": [101.6841, 0.5004],
+  "DI Yogyakarta": [110.3695, -7.7956],
+  "Nusa Tenggara Barat": [117.3616, -8.6529],
+  "Sumatera Selatan": [104.7458, -2.9909],
+};
+
+export default function SpkluMap({ selectedProvince }: { selectedProvince?: string | null }) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -160,6 +176,26 @@ export default function SpkluMap() {
       map.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!map.current || !loaded) return;
+
+    if (selectedProvince && PROVINCE_COORDS[selectedProvince]) {
+      map.current.flyTo({
+        center: PROVINCE_COORDS[selectedProvince],
+        zoom: 7,
+        essential: true,
+        duration: 1500,
+      });
+    } else {
+      map.current.flyTo({
+        center: [118, -2.5],
+        zoom: 4.2,
+        essential: true,
+        duration: 1500,
+      });
+    }
+  }, [selectedProvince, loaded]);
 
   return (
     <div className="relative w-full h-full">
