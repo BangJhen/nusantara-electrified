@@ -572,41 +572,111 @@ function ProvinceMiniBar({
 
 function OperatorDonut({ data, total }: { data: { name: string; value: number; color: string }[]; total: number }) {
   const [hover, setHover] = useState<any | null>(null);
+  const [selected, setSelected] = useState<any | null>(null);
   const { pos, onMouseMove } = useCursorTooltip();
 
+  const active = hover ?? selected;
+  const maxVal = Math.max(1, ...data.map((d) => d.value));
+
+  const handleClick = (item: any) => {
+    setSelected(selected?.name === item.name ? null : item);
+  };
+
   return (
-    <div className="grid h-full grid-cols-[1.08fr_0.92fr] items-center gap-2" onMouseMove={onMouseMove}>
-      <div className="grid place-items-center relative">
-        <SvgDonut data={data} total={total} size={208} hole={0.55} onHover={setHover}>
-          <div className="flex flex-col items-center justify-center rounded-full bg-white h-28 w-28 shadow-panel z-10 pointer-events-none">
-            <div className="font-heading text-[30px] font-bold leading-none text-brand-navy transition-all duration-300">{hover ? formatCompact(hover.value) : formatId(total)}</div>
-            <div className="mt-1 text-xs font-bold text-slate-500 transition-all duration-300">lokasi</div>
-          </div>
-        </SvgDonut>
+    <div className="flex h-full flex-col gap-3" onMouseMove={onMouseMove}>
+      {/* Bagian atas: Donut + legenda horizontal */}
+      <div className="flex items-center gap-4 flex-1 min-h-0">
+        {/* Donut */}
+        <div className="shrink-0 grid place-items-center">
+          <SvgDonut data={data} total={total} size={185} hole={0.57} onHover={setHover}>
+            <div className="flex flex-col items-center justify-center rounded-full bg-white h-24 w-24 shadow-panel z-10 pointer-events-none">
+              {active ? (
+                <>
+                  <div className="font-heading text-[22px] font-bold leading-none transition-all duration-300" style={{ color: active.color }}>{formatCompact(active.value)}</div>
+                  <div className="mt-0.5 text-[10px] font-bold text-slate-400">lokasi</div>
+                  <div className="mt-1 text-[10px] font-extrabold text-slate-500">{((active.value / total) * 100).toFixed(1).replace(".", ",")}%</div>
+                </>
+              ) : (
+                <>
+                  <div className="font-heading text-[26px] font-bold leading-none text-brand-navy">{formatId(total)}</div>
+                  <div className="mt-0.5 text-[10px] font-bold text-slate-400">total</div>
+                  <div className="mt-0.5 text-[10px] font-bold text-slate-400">SPKLU</div>
+                </>
+              )}
+            </div>
+          </SvgDonut>
+        </div>
+
+        {/* Legend cards */}
+        <div className="flex-1 flex flex-col gap-2 min-h-0">
+          {data.map((item, index) => {
+            const pct = (item.value / total) * 100;
+            const barPct = (item.value / maxVal) * 100;
+            const isActive = active?.name === item.name;
+            const isDimmed = active && !isActive;
+            return (
+              <div
+                key={item.name}
+                className={`group relative cursor-pointer rounded-xl border px-3 py-2 transition-all duration-300 ${
+                  isActive
+                    ? "border-transparent shadow-md scale-[1.02] origin-left"
+                    : isDimmed
+                    ? "border-transparent opacity-40 grayscale"
+                    : "border-brand-border hover:border-transparent hover:shadow-sm hover:scale-[1.01] origin-left"
+                }`}
+                style={{ backgroundColor: isActive ? `${item.color}18` : "white" }}
+                onMouseEnter={() => setHover(item)}
+                onMouseLeave={() => setHover(null)}
+                onClick={() => handleClick(item)}
+              >
+                {/* Header row */}
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className={`text-[11px] font-extrabold transition-colors ${isActive ? "text-brand-navy" : "text-brand-navy group-hover:text-brand-navy"}`}>
+                      {item.name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[11px] font-bold text-slate-500">{formatId(item.value)}</span>
+                    <span className={`text-[10px] font-extrabold rounded-full px-1.5 py-0.5 text-white`} style={{ backgroundColor: item.color }}>
+                      {pct.toFixed(1).replace(".", ",")}%
+                    </span>
+                  </div>
+                </div>
+                {/* Progress bar */}
+                <div className="h-1.5 rounded-full overflow-hidden bg-slate-100">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${barPct}%`, backgroundColor: item.color }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="space-y-3 relative z-10">
-        {data.map((item) => {
-          const isHovered = hover?.name === item.name;
-          return (
+      {/* Summary insight bar */}
+      <div className="flex items-center gap-2 rounded-xl bg-brand-soft px-3 py-2">
+        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Dominasi Pasar</span>
+        <div className="flex-1 h-1.5 rounded-full overflow-hidden bg-slate-200 flex">
+          {data.map((d) => (
             <div
-              key={item.name}
-              className={`flex items-start gap-2 text-sm transition-all duration-300 cursor-pointer ${isHovered ? 'scale-105 origin-left' : hover ? 'opacity-40 grayscale' : ''}`}
-            >
-              <span className="mt-1 h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-              <div>
-                <p className={`font-extrabold transition-colors ${isHovered ? 'text-brand-blue' : 'text-brand-navy'}`}>{item.name}</p>
-                <p className="text-xs text-slate-500">{formatId(item.value)} ({((item.value / total) * 100).toFixed(1).replace(".", ",")}%)</p>
-              </div>
-            </div>
-          );
-        })}
+              key={d.name}
+              className="h-full transition-all duration-300"
+              style={{ width: `${(d.value / total) * 100}%`, backgroundColor: d.color }}
+              title={d.name}
+            />
+          ))}
+        </div>
+        <span className="text-[10px] font-extrabold text-brand-navy">{data[0]?.name?.split(" ")[0]} #{1}</span>
       </div>
 
       {hover && (
         <FloatingTooltip pos={pos}>
           <p className="font-extrabold text-brand-navy">{hover.name}</p>
-          <p className="font-semibold text-slate-600">Lokasi: <span className="text-brand-blue">{formatId(hover.value)}</span></p>
+          <p className="font-semibold text-slate-600">Lokasi: <span className="text-brand-blue">{formatId(hover.value)} titik</span></p>
           <p className="font-semibold text-slate-600">Pangsa: <span className="text-brand-orange">{((hover.value / total) * 100).toFixed(1).replace(".", ",")}%</span></p>
         </FloatingTooltip>
       )}
