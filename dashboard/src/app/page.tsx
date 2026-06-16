@@ -761,49 +761,89 @@ function RupltPanel() {
   );
 }
 
-function SvgDonut({ data, total, size = 208, hole = 0.56, children, onHover }: { data: any[]; total: number; size?: number; hole?: number; children?: ReactNode; onHover?: (item: any) => void }) {
+function SvgDonut({
+  data,
+  total,
+  size = 208,
+  hole = 0.56,
+  children,
+  onHover,
+}: {
+  data: any[];
+  total: number;
+  size?: number;
+  hole?: number;
+  children?: ReactNode;
+  onHover?: (item: any) => void;
+}) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  
-  let currentAngle = 0;
+
   const center = size / 2;
-  const radius = size / 2;
-  const strokeWidth = radius * (1 - hole);
-  const r = radius - strokeWidth / 2;
+  const strokeWidth = (size / 2) * (1 - hole);
+  const r = size / 2 - strokeWidth / 2;
   const circumference = 2 * Math.PI * r;
-  
+
+  // Hitung posisi awal setiap segmen dalam bentuk "stroke offset shift"
+  let accumulated = 0;
+  const segments = data.map((item: any, index: number) => {
+    const fraction = item.value / total;
+    const sliceLength = fraction * circumference;
+    // Setiap circle dimulai dari 12 o'clock (sudah kena rotate -90 deg di SVG)
+    // offset = circumference - accumulated (seberapa jauh kita geser start point)
+    const dashOffset = circumference - accumulated;
+    accumulated += sliceLength;
+    return { item, index, sliceLength, dashOffset };
+  });
+
   return (
-    <div className="relative flex items-center justify-center drop-shadow-sm" style={{ width: size, height: size }} onMouseLeave={() => { setHoverIndex(null); onHover?.(null); }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible origin-center" style={{ transform: 'rotate(-90deg)' }}>
-        {data.map((item: any, index: number) => {
-          const sliceAngle = (item.value / total) * 360;
-          const sliceLength = (item.value / total) * circumference;
-          const strokeDashoffset = circumference - sliceLength;
-          const startAngle = currentAngle;
-          currentAngle += sliceAngle;
-          
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: size, height: size }}
+      onMouseLeave={() => {
+        setHoverIndex(null);
+        onHover?.(null);
+      }}
+    >
+      {/* SVG dirotate -90 agar segmen mulai dari atas (12 o'clock) */}
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        style={{ transform: "rotate(-90deg)" }}
+        className="overflow-visible"
+      >
+        {segments.map(({ item, index, sliceLength, dashOffset }) => {
           const isHovered = hoverIndex === index;
-          const scale = isHovered ? 1.05 : 1;
-          
           return (
             <circle
-              key={item.name}
+              key={item.name ?? index}
               cx={center}
               cy={center}
               r={r}
               fill="transparent"
               stroke={item.color}
-              strokeWidth={strokeWidth}
-              strokeDasharray={`${circumference} ${circumference}`}
-              strokeDashoffset={strokeDashoffset}
-              transform={`rotate(${startAngle + sliceAngle} ${center} ${center}) scale(${scale})`}
-              className="transition-all duration-300 cursor-pointer origin-center"
-              style={{ transformOrigin: `${center}px ${center}px` }}
-              onMouseEnter={() => { setHoverIndex(index); onHover?.(item); }}
+              strokeWidth={isHovered ? strokeWidth + 4 : strokeWidth}
+              strokeDasharray={`${sliceLength} ${circumference - sliceLength}`}
+              strokeDashoffset={dashOffset}
+              className="cursor-pointer transition-all duration-200"
+              style={{
+                filter: isHovered
+                  ? `drop-shadow(0 0 6px ${item.color}99)`
+                  : hoverIndex !== null
+                  ? "grayscale(60%) opacity(0.5)"
+                  : "none",
+              }}
+              onMouseEnter={() => {
+                setHoverIndex(index);
+                onHover?.(item);
+              }}
             />
           );
         })}
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+
+      {/* Konten tengah */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         {children}
       </div>
     </div>
