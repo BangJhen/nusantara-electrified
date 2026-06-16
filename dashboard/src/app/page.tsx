@@ -524,7 +524,7 @@ function ProvinceMiniBar({ data }: { data: ProvinceRecord[] }) {
   const { pos, onMouseMove } = useCursorTooltip();
   const max = Math.max(1, ...data.map((item) => item.station_count));
   return (
-    <div className="flex h-full flex-col justify-center gap-2.5" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
+    <div className="flex h-full flex-col justify-between" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
       {data.map((item, index) => {
         const pct = (item.station_count / max) * 100;
         const isTop3 = index < 3;
