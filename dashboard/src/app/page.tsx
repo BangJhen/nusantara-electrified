@@ -2,11 +2,46 @@
 
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const SpkluMap = dynamic(() => import("@/components/map/SpkluMap"), {
   ssr: false,
 });
+
+// ─── Cursor-following tooltip ───────────────────────────────────────────────
+function useCursorTooltip() {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const onMouseMove = useCallback((e: React.MouseEvent) => {
+    setPos({ x: e.clientX, y: e.clientY });
+  }, []);
+  return { pos, onMouseMove };
+}
+
+function FloatingTooltip({ pos, children }: { pos: { x: number; y: number }; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState({ x: 16, y: -8 });
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const { width, height } = ref.current.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const ox = pos.x + 16 + width > vw ? -(width + 16) : 16;
+    const oy = pos.y - 8 - height < 0 ? 16 : -8;
+    setOffset({ x: ox, y: oy });
+  }, [pos]);
+
+  return (
+    <div
+      ref={ref}
+      className="pointer-events-none fixed z-[9999] rounded-xl border border-brand-border bg-white/95 px-3 py-2 text-xs shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur-sm transition-none"
+      style={{ left: pos.x + offset.x, top: pos.y + offset.y }}
+    >
+      {children}
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 type BevRecord = {
   year: number;
@@ -495,31 +530,32 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
 
 function ProvinceMiniBar({ data }: { data: ProvinceRecord[] }) {
   const [hover, setHover] = useState<ProvinceRecord | null>(null);
+  const { pos, onMouseMove } = useCursorTooltip();
   const max = Math.max(1, ...data.map((item) => item.station_count));
   return (
-    <div className="relative flex h-full flex-col justify-center gap-2" onMouseLeave={() => setHover(null)}>
+    <div className="flex h-full flex-col justify-center gap-2" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
       {data.map((item) => {
         const pct = (item.station_count / max) * 100;
         return (
-          <div 
-            key={item.province} 
+          <div
+            key={item.province}
             className="group grid grid-cols-[92px_1fr_34px] items-center gap-2 text-[11px] font-bold text-brand-navy cursor-pointer"
             onMouseEnter={() => setHover(item)}
           >
             <span className="leading-tight truncate group-hover:text-brand-blue transition-colors">{item.province}</span>
             <div className="h-4 overflow-hidden rounded-sm bg-brand-soft">
-              <div className="h-full rounded-sm bg-brand-blue transition-all duration-300 group-hover:bg-brand-blueDark" style={{ width: `${pct}%` }} />
+              <div className="h-full rounded-sm bg-brand-blue transition-all duration-300 group-hover:brightness-90" style={{ width: `${pct}%` }} />
             </div>
             <span className="text-right group-hover:text-brand-blue transition-colors">{item.station_count}</span>
           </div>
         );
       })}
-      
+
       {hover && (
-        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-brand-border bg-white/95 px-3 py-2 text-xs shadow-card backdrop-blur-sm z-10">
+        <FloatingTooltip pos={pos}>
           <p className="font-extrabold text-brand-navy">{hover.province}</p>
           <p className="font-semibold text-slate-600">Total SPKLU: <span className="text-brand-blue">{formatId(hover.station_count)} lokasi</span></p>
-        </div>
+        </FloatingTooltip>
       )}
     </div>
   );
@@ -527,14 +563,15 @@ function ProvinceMiniBar({ data }: { data: ProvinceRecord[] }) {
 
 function OperatorDonut({ data, total }: { data: { name: string; value: number; color: string }[]; total: number }) {
   const [hover, setHover] = useState<any | null>(null);
-  
+  const { pos, onMouseMove } = useCursorTooltip();
+
   return (
-    <div className="grid h-full grid-cols-[1.08fr_0.92fr] items-center gap-2">
+    <div className="grid h-full grid-cols-[1.08fr_0.92fr] items-center gap-2" onMouseMove={onMouseMove}>
       <div className="grid place-items-center relative">
         <SvgDonut data={data} total={total} size={208} hole={0.55} onHover={setHover}>
           <div className="flex flex-col items-center justify-center rounded-full bg-white h-28 w-28 shadow-panel z-10 pointer-events-none">
             <div className="font-heading text-[30px] font-bold leading-none text-brand-navy transition-all duration-300">{hover ? formatCompact(hover.value) : formatId(total)}</div>
-            <div className="mt-1 text-xs font-bold text-slate-500 transition-all duration-300">{hover ? 'lokasi' : 'lokasi'}</div>
+            <div className="mt-1 text-xs font-bold text-slate-500 transition-all duration-300">lokasi</div>
           </div>
         </SvgDonut>
       </div>
@@ -543,8 +580,8 @@ function OperatorDonut({ data, total }: { data: { name: string; value: number; c
         {data.map((item) => {
           const isHovered = hover?.name === item.name;
           return (
-            <div 
-              key={item.name} 
+            <div
+              key={item.name}
               className={`flex items-start gap-2 text-sm transition-all duration-300 cursor-pointer ${isHovered ? 'scale-105 origin-left' : hover ? 'opacity-40 grayscale' : ''}`}
             >
               <span className="mt-1 h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
@@ -556,6 +593,14 @@ function OperatorDonut({ data, total }: { data: { name: string; value: number; c
           );
         })}
       </div>
+
+      {hover && (
+        <FloatingTooltip pos={pos}>
+          <p className="font-extrabold text-brand-navy">{hover.name}</p>
+          <p className="font-semibold text-slate-600">Lokasi: <span className="text-brand-blue">{formatId(hover.value)}</span></p>
+          <p className="font-semibold text-slate-600">Pangsa: <span className="text-brand-orange">{((hover.value / total) * 100).toFixed(1).replace(".", ",")}%</span></p>
+        </FloatingTooltip>
+      )}
     </div>
   );
 }
@@ -614,13 +659,14 @@ function TargetPanel() {
 
 function JavaDistribution({ data }: { data: { name: string; value: number; color: string }[] }) {
   const [hover, setHover] = useState<any | null>(null);
-  
+  const { pos, onMouseMove } = useCursorTooltip();
+
   return (
-    <div className="flex h-full min-h-[205px] flex-col items-center justify-center gap-4 overflow-hidden">
+    <div className="flex h-full min-h-[205px] flex-col items-center justify-center gap-4 overflow-hidden" onMouseMove={onMouseMove}>
       <div className="relative h-32 w-32 shrink-0 md:h-36 md:w-36">
         <SvgDonut data={data} total={100} size={144} hole={0.6} onHover={setHover}>
           <div className="flex flex-col items-center justify-center rounded-full bg-white h-20 w-20 shadow-panel z-10 pointer-events-none">
-             <Icon name="pin" className={`h-8 w-8 transition-all duration-300 ${hover ? 'text-brand-blue scale-110' : 'text-slate-300'}`} />
+            <Icon name="pin" className={`h-8 w-8 transition-all duration-300 ${hover ? 'text-brand-blue scale-110' : 'text-slate-300'}`} />
           </div>
         </SvgDonut>
       </div>
@@ -629,8 +675,8 @@ function JavaDistribution({ data }: { data: { name: string; value: number; color
         {data.map((item) => {
           const isHovered = hover?.name === item.name;
           return (
-            <div 
-              key={item.name} 
+            <div
+              key={item.name}
               onMouseEnter={() => setHover(item)}
               onMouseLeave={() => setHover(null)}
               className={`rounded-xl border border-brand-border bg-[#F8FBFF] px-2 py-2 text-center transition-all duration-300 cursor-pointer ${isHovered ? 'ring-2 ring-brand-blue/30 border-brand-blue scale-105 shadow-md' : hover ? 'opacity-50 grayscale' : 'hover:-translate-y-1 hover:shadow-md'}`}
@@ -644,6 +690,14 @@ function JavaDistribution({ data }: { data: { name: string; value: number; color
           );
         })}
       </div>
+
+      {hover && (
+        <FloatingTooltip pos={pos}>
+          <p className="font-extrabold text-brand-navy">{hover.name}</p>
+          <p className="font-semibold text-slate-600">Porsi: <span className="text-brand-blue">{String(hover.value).replace(".", ",")}%</span></p>
+          <p className="mt-0.5 text-[10px] text-slate-400">dari total SPKLU Indonesia</p>
+        </FloatingTooltip>
+      )}
     </div>
   );
 }
@@ -680,13 +734,14 @@ function TensionPanel() {
 
 function ConnectorPanel({ data, total }: { data: ConnectorRecord[]; total: number }) {
   const [hover, setHover] = useState<ConnectorRecord | null>(null);
+  const { pos, onMouseMove } = useCursorTooltip();
   const colors = [BRAND.blue, BRAND.orange, BRAND.teal, BRAND.green, "#7557B8", "#91A4C4"];
   return (
-    <div className="relative space-y-3" onMouseLeave={() => setHover(null)}>
+    <div className="space-y-3" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
       {data.slice(0, 6).map((item, index) => {
         const pct = total ? (item.count / total) * 100 : 0;
         return (
-          <div 
+          <div
             key={item.connector_type}
             className="group cursor-pointer"
             onMouseEnter={() => setHover(item)}
@@ -701,13 +756,13 @@ function ConnectorPanel({ data, total }: { data: ConnectorRecord[]; total: numbe
           </div>
         );
       })}
-      
+
       {hover && (
-        <div className="pointer-events-none absolute right-0 top-0 -translate-y-[110%] rounded-xl border border-brand-border bg-white/95 px-3 py-2 text-xs shadow-card backdrop-blur-sm z-10">
-          <p className="font-extrabold text-brand-navy">Tipe: {hover.connector_type}</p>
+        <FloatingTooltip pos={pos}>
+          <p className="font-extrabold text-brand-navy">{hover.connector_type}</p>
           <p className="font-semibold text-slate-600">Jumlah: <span className="text-brand-blue">{formatId(hover.count)} unit</span></p>
           <p className="font-semibold text-slate-600">Porsi: <span className="text-brand-orange">{((hover.count / total) * 100).toFixed(1).replace(".", ",")}%</span></p>
-        </div>
+        </FloatingTooltip>
       )}
     </div>
   );
@@ -715,28 +770,30 @@ function ConnectorPanel({ data, total }: { data: ConnectorRecord[]; total: numbe
 
 function RupltPanel() {
   const [hover, setHover] = useState<string | null>(null);
+  const { pos, onMouseMove } = useCursorTooltip();
   const total = 69.5;
   const parts = [
     { label: "EBT", value: 42.6, color: BRAND.green, detail: "Energi Baru Terbarukan" },
     { label: "Fosil", value: 16.6, color: BRAND.orange, detail: "Energi Fosil (PLTU dll)" },
     { label: "Storage", value: 10.3, color: BRAND.teal, detail: "Penyimpanan BESS/Pumped" },
   ];
+  const hovered = parts.find((p) => p.label === hover);
   return (
-    <div className="relative space-y-4" onMouseLeave={() => setHover(null)}>
-      <div className="overflow-hidden rounded-full bg-brand-soft flex h-7 w-full cursor-pointer">
+    <div className="space-y-4" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
+      <div className="flex h-7 w-full overflow-hidden rounded-full bg-brand-soft cursor-pointer">
         {parts.map((part) => (
-          <div 
-            key={part.label} 
+          <div
+            key={part.label}
             onMouseEnter={() => setHover(part.label)}
             className={`h-full transition-all duration-300 ${hover === part.label ? 'brightness-110' : hover ? 'opacity-50 grayscale' : 'hover:brightness-110'}`}
-            style={{ width: `${(part.value / total) * 100}%`, backgroundColor: part.color }} 
+            style={{ width: `${(part.value / total) * 100}%`, backgroundColor: part.color }}
           />
         ))}
       </div>
       <div className="grid grid-cols-3 gap-2">
         {parts.map((part) => (
-          <div 
-            key={part.label} 
+          <div
+            key={part.label}
             onMouseEnter={() => setHover(part.label)}
             className={`rounded-xl border border-brand-border bg-[#F8FBFF] p-3 transition-all duration-300 cursor-pointer ${hover === part.label ? 'ring-2 ring-brand-blue/30 border-brand-blue scale-105 shadow-md' : hover ? 'opacity-50 grayscale' : 'hover:-translate-y-1 hover:shadow-md'}`}
           >
@@ -750,12 +807,12 @@ function RupltPanel() {
         Total kapasitas baru RUPTL 2025–2034: <strong className="text-brand-navy">69,5 GW</strong>, termasuk 47.758 km jaringan transmisi baru.
       </p>
 
-      {hover && (
-        <div className="pointer-events-none absolute left-1/2 top-[-10px] -translate-x-1/2 -translate-y-[110%] rounded-xl border border-brand-border bg-white/95 px-3 py-2 text-xs shadow-card backdrop-blur-sm z-10 w-max">
-          <p className="font-extrabold text-brand-navy">{parts.find(p => p.label === hover)?.detail}</p>
-          <p className="font-semibold text-slate-600">Kapasitas: <span className="text-brand-blue">{parts.find(p => p.label === hover)?.value} GW</span></p>
-          <p className="font-semibold text-slate-600">Porsi: <span className="text-brand-orange">{((parts.find(p => p.label === hover)!.value / total) * 100).toFixed(1).replace(".", ",")}%</span></p>
-        </div>
+      {hover && hovered && (
+        <FloatingTooltip pos={pos}>
+          <p className="font-extrabold text-brand-navy">{hovered.detail}</p>
+          <p className="font-semibold text-slate-600">Kapasitas: <span className="text-brand-blue">{hovered.value} GW</span></p>
+          <p className="font-semibold text-slate-600">Porsi: <span className="text-brand-orange">{((hovered.value / total) * 100).toFixed(1).replace(".", ",")}%</span></p>
+        </FloatingTooltip>
       )}
     </div>
   );
