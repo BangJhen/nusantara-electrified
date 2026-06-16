@@ -447,7 +447,7 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
   const width = 680;
   const height = 300;
   const left = 58;
-  const right = 34;
+  const right = 54;
   const top = 38;
   const bottom = 44;
   const innerWidth = width - left - right;
@@ -481,7 +481,7 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
             <g key={ratio}>
               <line x1={left} x2={width - right} y1={y} y2={y} stroke={BRAND.border} strokeDasharray="4 4" />
               <text x={left - 12} y={y + 4} textAnchor="end" fontSize="12" fill={BRAND.navy}>{formatCompact(maxUnits * ratio)}</text>
-              <text x={width - right + 10} y={y + 4} fontSize="12" fill={BRAND.orange}>{Math.round(maxGrowth * ratio)}%</text>
+              <text x={width - right + 22} y={y + 4} fontSize="12" fill={BRAND.orange}>{Math.round(maxGrowth * ratio)}%</text>
             </g>
           );
         })}
