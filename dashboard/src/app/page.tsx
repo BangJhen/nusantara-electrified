@@ -301,12 +301,12 @@ export default function Home() {
             </section>
 
             {/* ── Tren, Tantangan & Kesiapan Ekosistem ── */}
-            <section className="mt-3 grid grid-cols-1 gap-3 xl:grid-cols-12">
-              <Panel className="xl:col-span-4" title="Kesiapan Ekosistem EV Indonesia">
+            <section className="mt-3 grid grid-cols-1 gap-3 xl:grid-cols-12 items-stretch">
+              <Panel className="xl:col-span-4" contentClassName="flex flex-col" title="Kesiapan Ekosistem EV Indonesia">
                 <EcosystemRadar />
               </Panel>
 
-              <Panel className="xl:col-span-5" title="Roadmap & Milestone Kebijakan EV">
+              <Panel className="xl:col-span-5" contentClassName="flex flex-col" title="Roadmap & Milestone Kebijakan EV">
                 <PolicyTimeline />
               </Panel>
 
@@ -429,17 +429,19 @@ function Panel({
   title,
   children,
   className = "",
+  contentClassName = "",
 }: {
   title: string;
   children: ReactNode;
   className?: string;
+  contentClassName?: string;
 }) {
   return (
-    <article className={`dashboard-panel ${className}`}>
-      <div className="flex items-center justify-between border-b border-brand-border px-5 py-3">
+    <article className={`dashboard-panel flex flex-col min-h-0 ${className}`}>
+      <div className="flex items-center justify-between border-b border-brand-border px-5 py-3 shrink-0">
         <h2 className="font-heading text-lg font-bold tracking-wide text-brand-navy">{title}</h2>
       </div>
-      <div className="p-4">{children}</div>
+      <div className={`p-4 flex-1 min-h-0 ${contentClassName}`}>{children}</div>
     </article>
   );
 }
@@ -1226,7 +1228,7 @@ function EcosystemRadar() {
   );
 
   return (
-    <div className="flex gap-3" onMouseMove={onMouseMove} onMouseLeave={() => setHover(null)}>
+    <div className="flex gap-3 h-full items-center min-h-0" onMouseMove={onMouseMove} onMouseLeave={() => setHover(null)}>
       {/* SVG Radar */}
       <div className="relative shrink-0">
         <svg width="280" height="280" viewBox="0 0 280 280">
@@ -1338,9 +1340,9 @@ function PolicyTimeline() {
   };
 
   return (
-    <div className="relative flex flex-col gap-0">
+    <div className="relative flex flex-col justify-between flex-1 min-h-0 py-1">
       {/* Vertical axis line */}
-      <div className="absolute left-[52px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-brand-blue via-brand-teal to-brand-green rounded-full" />
+      <div className="absolute left-[52px] top-4 bottom-4 w-0.5 bg-gradient-to-b from-brand-blue via-brand-teal to-brand-green rounded-full" />
 
       {milestones.map((m, i) => {
         const t = toneMap[m.tone];
