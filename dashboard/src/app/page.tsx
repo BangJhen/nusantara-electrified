@@ -291,11 +291,11 @@ export default function Home() {
                 <TensionPanel />
               </Panel>
 
-              <Panel className="xl:col-span-6" title="Jenis Konektor SPKLU">
+              <Panel className="xl:col-span-6" contentClassName="flex flex-col" title="Jenis Konektor SPKLU">
                 <ConnectorPanel data={connectorData} total={totalConnectors} />
               </Panel>
 
-              <Panel className="xl:col-span-6" title="RUPTL 2025–2034: Kapasitas Baru">
+              <Panel className="xl:col-span-6" contentClassName="flex flex-col" title="RUPTL 2025–2034: Kapasitas Baru">
                 <RupltPanel />
               </Panel>
             </section>
@@ -1022,22 +1022,43 @@ function ConnectorPanel({ data, total }: { data: ConnectorRecord[]; total: numbe
   const [hover, setHover] = useState<ConnectorRecord | null>(null);
   const { pos, onMouseMove } = useCursorTooltip();
   const colors = [BRAND.blue, BRAND.orange, BRAND.teal, BRAND.green, "#7557B8", "#91A4C4"];
+  
   return (
-    <div className="space-y-3" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 flex-1" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
       {data.slice(0, 6).map((item, index) => {
         const pct = total ? (item.count / total) * 100 : 0;
+        const color = colors[index];
+        const isHov = hover === item;
         return (
           <div
             key={item.connector_type}
-            className="group cursor-pointer"
+            className={`group relative overflow-hidden rounded-2xl border p-3.5 transition-all duration-300 cursor-pointer flex flex-col justify-between ${isHov ? 'border-transparent shadow-md scale-105 z-10' : 'border-brand-border hover:shadow-sm'}`}
+            style={{ backgroundColor: isHov ? `${color}11` : "white" }}
             onMouseEnter={() => setHover(item)}
           >
-            <div className="mb-1 flex items-center justify-between text-xs font-bold text-brand-navy">
-              <span className="transition-colors group-hover:text-brand-blue">{item.connector_type}</span>
-              <span className="transition-colors group-hover:text-brand-blue">{formatId(item.count)}</span>
+            {/* Background Decorative Icon */}
+            <div className="absolute -right-4 -bottom-4 opacity-5 transition-transform duration-500 group-hover:scale-150 group-hover:-rotate-12" style={{ color }}>
+              <Icon name="plug" className="h-24 w-24" />
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-brand-soft">
-              <div className="h-full rounded-full transition-all duration-300 group-hover:brightness-110" style={{ width: `${pct}%`, backgroundColor: colors[index] }} />
+
+            <div className="relative z-10 flex items-start gap-2.5 mb-4">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-colors duration-300" style={{ backgroundColor: isHov ? color : `${color}1A`, color: isHov ? 'white' : color }}>
+                <Icon name="bolt" className="h-5 w-5" />
+              </div>
+              <p className="text-[11px] font-extrabold text-brand-navy leading-snug pt-1">{item.connector_type}</p>
+            </div>
+            
+            <div className="relative z-10">
+              <div className="flex items-end justify-between mb-1.5">
+                <p className="font-heading text-2xl font-black leading-none" style={{ color }}>
+                  {formatId(item.count)}
+                </p>
+                <p className="text-[11px] font-black" style={{ color }}>{pct.toFixed(1)}%</p>
+              </div>
+              
+              <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: color, boxShadow: isHov ? `0 0 8px ${color}88` : 'none' }} />
+              </div>
             </div>
           </div>
         );
@@ -1059,45 +1080,104 @@ function RupltPanel() {
   const { pos, onMouseMove } = useCursorTooltip();
   const total = 69.5;
   const parts = [
-    { label: "EBT", value: 42.6, color: BRAND.green, detail: "Energi Baru Terbarukan" },
-    { label: "Fosil", value: 16.6, color: BRAND.orange, detail: "Energi Fosil (PLTU dll)" },
-    { label: "Storage", value: 10.3, color: BRAND.teal, detail: "Penyimpanan BESS/Pumped" },
+    { label: "EBT", value: 42.6, color: BRAND.green, detail: "Energi Baru Terbarukan", icon: "leaf-shield" },
+    { label: "Fosil", value: 16.6, color: BRAND.orange, detail: "Energi Fosil (PLTU dll)", icon: "emission" },
+    { label: "Storage", value: 10.3, color: BRAND.teal, detail: "Penyimpanan BESS/Pumped", icon: "battery" },
   ];
-  const hovered = parts.find((p) => p.label === hover);
+  
+  const R = 85;
+  const strokeW = 32;
+  const halfC = Math.PI * R;
+  
+  let currentOffset = 0;
+  const segments = parts.map(p => {
+    const fraction = p.value / total;
+    const len = fraction * halfC;
+    const offset = currentOffset;
+    currentOffset += len;
+    return { ...p, len, offset };
+  });
+
+  const hoveredPart = parts.find((p) => p.label === hover);
+
   return (
-    <div className="space-y-4" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
-      <div className="flex h-7 w-full overflow-hidden rounded-full bg-brand-soft cursor-pointer">
-        {parts.map((part) => (
-          <div
-            key={part.label}
-            onMouseEnter={() => setHover(part.label)}
-            className={`h-full transition-all duration-300 ${hover === part.label ? 'brightness-110' : hover ? 'opacity-50 grayscale' : 'hover:brightness-110'}`}
-            style={{ width: `${(part.value / total) * 100}%`, backgroundColor: part.color }}
-          />
-        ))}
+    <div className="flex h-full flex-col justify-between flex-1 min-h-0" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
+      {/* Gauge Chart SVG */}
+      <div className="relative flex justify-center mt-2 shrink-0">
+        <svg viewBox="0 0 200 110" className="w-[260px] h-auto overflow-visible">
+          {/* Rotate 180 to draw from 9 o'clock to 3 o'clock */}
+          <g transform="translate(100, 100) rotate(180)">
+            {/* Background Track */}
+            <circle cx="0" cy="0" r={R} fill="none" stroke={BRAND.soft} strokeWidth={strokeW} strokeDasharray={`${halfC} 1000`} />
+            
+            {/* Segments */}
+            {segments.map((seg) => {
+              const isHov = hover === seg.label;
+              return (
+                <circle
+                  key={seg.label}
+                  cx="0"
+                  cy="0"
+                  r={R}
+                  fill="none"
+                  stroke={seg.color}
+                  strokeWidth={isHov ? strokeW + 6 : strokeW}
+                  strokeDasharray={`${seg.len} 1000`}
+                  strokeDashoffset={-seg.offset}
+                  pointerEvents="stroke"
+                  className="cursor-pointer transition-all duration-300"
+                  style={{
+                    filter: isHov ? `drop-shadow(0 0 6px ${seg.color}99)` : hover ? "grayscale(50%) opacity(0.5)" : "none",
+                  }}
+                  onMouseEnter={() => setHover(seg.label)}
+                />
+              );
+            })}
+          </g>
+          {/* Inner text */}
+          <text x="100" y="85" textAnchor="middle" fill={BRAND.navy} fontSize="32" fontWeight="900" className="font-heading">
+            69,5
+          </text>
+          <text x="100" y="102" textAnchor="middle" fill={BRAND.gray} fontSize="10" fontWeight="bold">
+            Giga Watt (GW)
+          </text>
+        </svg>
       </div>
-      <div className="grid grid-cols-3 gap-2">
-        {parts.map((part) => (
-          <div
-            key={part.label}
-            onMouseEnter={() => setHover(part.label)}
-            className={`rounded-xl border border-brand-border bg-[#F8FBFF] p-3 transition-all duration-300 cursor-pointer ${hover === part.label ? 'ring-2 ring-brand-blue/30 border-brand-blue scale-105 shadow-md' : hover ? 'opacity-50 grayscale' : 'hover:-translate-y-1 hover:shadow-md'}`}
-          >
-            <div className="mb-2 h-2 w-8 rounded-full" style={{ backgroundColor: part.color }} />
-            <p className="text-xs font-extrabold text-brand-navy">{part.label}</p>
-            <p className="font-heading text-2xl font-bold text-brand-blue">{String(part.value).replace(".", ",")} <span className="text-xs">GW</span></p>
-          </div>
-        ))}
+
+      {/* Cards below */}
+      <div className="grid grid-cols-3 gap-2.5 mt-2">
+        {parts.map((part) => {
+           const isHov = hover === part.label;
+           return (
+             <div
+               key={part.label}
+               onMouseEnter={() => setHover(part.label)}
+               className={`relative overflow-hidden rounded-xl border p-2.5 transition-all duration-300 cursor-pointer ${isHov ? 'border-transparent shadow-md scale-105 z-10' : 'border-brand-border hover:shadow-sm'}`}
+               style={{ backgroundColor: isHov ? `${part.color}11` : "white" }}
+             >
+               <div className="flex flex-col items-center text-center">
+                 <div className="grid h-8 w-8 place-items-center rounded-full mb-1.5 transition-colors duration-300" style={{ backgroundColor: isHov ? part.color : `${part.color}1A`, color: isHov ? 'white' : part.color }}>
+                   <Icon name={part.icon} className="h-4 w-4" />
+                 </div>
+                 <p className="text-[10px] font-extrabold uppercase text-brand-navy">{part.label}</p>
+                 <p className="font-heading text-[22px] font-black leading-none mt-1" style={{ color: part.color }}>{String(part.value).replace(".", ",")}</p>
+                 <p className="text-[9px] font-bold text-slate-400 mt-0.5">{((part.value / total)*100).toFixed(0)}%</p>
+               </div>
+             </div>
+           );
+        })}
       </div>
-      <p className="text-xs font-semibold leading-relaxed text-slate-500">
-        Total kapasitas baru RUPTL 2025–2034: <strong className="text-brand-navy">69,5 GW</strong>, termasuk 47.758 km jaringan transmisi baru.
+
+      {/* Footer Text */}
+      <p className="text-[11px] font-medium leading-relaxed text-slate-500 mt-4 px-2 text-center">
+        RUPTL mencanangkan <strong className="text-brand-navy">47.758 km</strong> jaringan transmisi baru untuk dukung transisi hijau.
       </p>
 
-      {hover && hovered && (
+      {hover && hoveredPart && (
         <FloatingTooltip pos={pos}>
-          <p className="font-extrabold text-brand-navy">{hovered.detail}</p>
-          <p className="font-semibold text-slate-600">Kapasitas: <span className="text-brand-blue">{hovered.value} GW</span></p>
-          <p className="font-semibold text-slate-600">Porsi: <span className="text-brand-orange">{((hovered.value / total) * 100).toFixed(1).replace(".", ",")}%</span></p>
+          <p className="font-extrabold text-brand-navy">{hoveredPart.detail}</p>
+          <p className="font-semibold text-slate-600">Kapasitas: <span className="text-brand-blue">{hoveredPart.value} GW</span></p>
+          <p className="font-semibold text-slate-600">Porsi: <span className="text-brand-orange">{((hoveredPart.value / total) * 100).toFixed(1).replace(".", ",")}%</span></p>
         </FloatingTooltip>
       )}
     </div>
