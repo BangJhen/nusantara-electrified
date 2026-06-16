@@ -182,36 +182,6 @@ export default function Home() {
       <Topbar />
 
       <main className="mx-auto max-w-[1760px] p-3 lg:p-4">
-        <section className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex flex-wrap items-center gap-3">
-                <FilterSelect
-                  icon="calendar"
-                  label="Periode"
-                  value={yearRange}
-                  onChange={setYearRange}
-                  options={["2020-2025", "2022-2025", "2024-2025"]}
-                />
-                <FilterSelect
-                  icon="globe"
-                  label="Wilayah"
-                  value={region}
-                  onChange={setRegion}
-                  options={["Semua Wilayah", "Jawa", "Luar Jawa"]}
-                />
-              </div>
-
-              {/* <div className="flex items-center gap-3 text-sm text-slate-600">
-                <span>Terakhir diperbarui: {lastUpdated}</span>
-                <button
-                  type="button"
-                  onClick={refreshData}
-                  className="grid h-10 w-10 place-items-center rounded-xl border border-brand-border bg-white text-brand-navy shadow-panel transition hover:border-brand-blue hover:text-brand-blue"
-                  aria-label="Perbarui data"
-                >
-                  <Icon name="refresh" className={refreshing ? "animate-spin" : ""} />
-                </button>
-              </div> */}
-            </section>
 
             <section className="mb-3 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
               <KpiCard
@@ -447,7 +417,7 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
   const width = 680;
   const height = 300;
   const left = 58;
-  const right = 54;
+  const right = 72;
   const top = 38;
   const bottom = 44;
   const innerWidth = width - left - right;
@@ -481,7 +451,7 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
             <g key={ratio}>
               <line x1={left} x2={width - right} y1={y} y2={y} stroke={BRAND.border} strokeDasharray="4 4" />
               <text x={left - 12} y={y + 4} textAnchor="end" fontSize="12" fill={BRAND.navy}>{formatCompact(maxUnits * ratio)}</text>
-              <text x={width - right + 22} y={y + 4} fontSize="12" fill={BRAND.orange}>{Math.round(maxGrowth * ratio)}%</text>
+              <text x={width - right + 44} y={y + 4} fontSize="12" fill={BRAND.orange}>{Math.round(maxGrowth * ratio)}%</text>
             </g>
           );
         })}
