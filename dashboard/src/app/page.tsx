@@ -443,6 +443,7 @@ function Panel({
 
 function GrowthChart({ data }: { data: BevRecord[] }) {
   const [hover, setHover] = useState<BevRecord | null>(null);
+  const { pos, onMouseMove } = useCursorTooltip();
   const width = 680;
   const height = 300;
   const left = 58;
@@ -468,7 +469,7 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
   }
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative h-full w-full" onMouseMove={onMouseMove} onMouseLeave={() => setHover(null)}>
       <div className="absolute left-5 top-1 z-10 flex items-center gap-4 text-xs font-bold">
         <span className="flex items-center gap-1 text-brand-blue"><i className="h-2.5 w-5 rounded-sm bg-brand-blue" />Penjualan (unit)</span>
         <span className="flex items-center gap-1 text-brand-orange"><i className="h-2.5 w-5 rounded-sm bg-brand-orange" />Kenaikan (%)</span>
@@ -518,11 +519,11 @@ function GrowthChart({ data }: { data: BevRecord[] }) {
       </svg>
 
       {hover && (
-        <div className="absolute right-2 top-9 rounded-xl border border-brand-border bg-white px-3 py-2 text-xs shadow-card">
+        <FloatingTooltip pos={pos}>
           <p className="font-extrabold text-brand-navy">Tahun {hover.year}</p>
           <p className="font-semibold text-slate-600">BEV: <span className="text-brand-blue">{formatId(hover.bev_wholesales_units)} unit</span></p>
           <p className="font-semibold text-slate-600">YoY: <span className="text-brand-orange">{hover.growth_yoy_pct ? `${String(hover.growth_yoy_pct).replace(".", ",")}%` : "-"}</span></p>
-        </div>
+        </FloatingTooltip>
       )}
     </div>
   );
