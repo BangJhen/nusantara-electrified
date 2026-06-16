@@ -241,18 +241,18 @@ export default function Home() {
                   <div className="overflow-hidden rounded-2xl border border-brand-border bg-[#F5F9FF] shadow-inner relative">
                     <SpkluMap selectedProvince={selectedProvince} />
                   </div>
-                  <div className="flex min-h-0 flex-col gap-3">
-                    <div className="rounded-xl bg-blue-50/80 border border-blue-100 p-3 flex gap-2.5 items-start shadow-sm">
+                  <div className="flex min-h-0 flex-col gap-2.5">
+                    <div className="rounded-xl bg-blue-50/80 border border-blue-100 px-3 py-2 flex gap-2.5 items-start shadow-sm">
                       <div className="mt-0.5 text-brand-blue">
                          <Icon name="pin" className="h-4 w-4" />
                       </div>
-                      <p className="text-[11px] font-medium leading-relaxed text-brand-navy">
+                      <p className="text-[11px] font-medium leading-tight text-brand-navy">
                         <strong className="font-extrabold block mb-0.5 text-brand-blue">Kilas Insight</strong>
-                        Fasilitas daya publik mayoritas masih terpusat di kawasan Jawa dan kota-kota strategis.
+                        Fasilitas daya publik mayoritas masih terpusat di kawasan Jawa dan kota strategis.
                       </p>
                     </div>
                     
-                    <div className="flex-1 rounded-xl border border-brand-border bg-white p-3.5 shadow-sm flex flex-col min-h-0">
+                    <div className="flex-1 rounded-xl border border-brand-border bg-white p-3 shadow-sm flex flex-col min-h-0">
                       <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
                         <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Top Distribusi SPKLU</h3>
                         <Icon name="trend" className="h-3.5 w-3.5 text-slate-300" />
@@ -537,7 +537,7 @@ function ProvinceMiniBar({
   const { pos, onMouseMove } = useCursorTooltip();
   const max = Math.max(1, ...data.map((item) => item.station_count));
   return (
-    <div className="flex h-full flex-col justify-between" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
+    <div className="flex h-full flex-col justify-between overflow-y-auto pr-1" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
       {data.map((item, index) => {
         const pct = (item.station_count / max) * 100;
         const isTop3 = index < 3;
@@ -546,7 +546,7 @@ function ProvinceMiniBar({
         return (
           <div
             key={item.province}
-            className={`group grid grid-cols-[16px_86px_1fr_32px] items-center gap-2 text-[11px] font-bold cursor-pointer transition-all duration-200 ${isSelected ? 'bg-blue-50/70 -mx-1 px-1 py-0.5 rounded-lg text-brand-blue' : 'text-brand-navy hover:bg-slate-50/50 -mx-1 px-1 py-0.5 rounded-lg'}`}
+            className={`group grid grid-cols-[16px_86px_1fr_32px] items-center gap-2 text-[11px] font-bold cursor-pointer transition-all duration-200 ${isSelected ? 'bg-blue-50/70 -mx-1 px-1 rounded-md text-brand-blue' : 'text-brand-navy hover:bg-slate-50/50 -mx-1 px-1 rounded-md'}`}
             onMouseEnter={() => setHover(item)}
             onClick={() => onSelectProvince?.(isSelected ? null : item.province)}
           >
