@@ -236,16 +236,29 @@ export default function Home() {
               </Panel>
 
               <Panel className="xl:col-span-5" title="Sebaran SPKLU">
-                <div className="grid h-[310px] grid-cols-1 gap-3 md:grid-cols-[1.45fr_1fr]">
-                  <div className="overflow-hidden rounded-xl border border-brand-border bg-brand-soft">
+                <div className="grid h-[310px] grid-cols-1 gap-4 md:grid-cols-[1.45fr_1fr]">
+                  <div className="overflow-hidden rounded-2xl border border-brand-border bg-[#F5F9FF] shadow-inner relative">
                     <SpkluMap />
                   </div>
-                  <div className="flex min-h-0 flex-col">
-                    <p className="mb-2 text-xs leading-relaxed text-slate-600">
-                      Pengisian daya publik masih terkonsentrasi di Jawa dan pusat ekonomi besar.
-                    </p>
-                    <div className="min-h-0 flex-1">
-                      <ProvinceMiniBar data={visibleProvinceData} />
+                  <div className="flex min-h-0 flex-col gap-3">
+                    <div className="rounded-xl bg-blue-50/80 border border-blue-100 p-3 flex gap-2.5 items-start shadow-sm">
+                      <div className="mt-0.5 text-brand-blue">
+                         <Icon name="pin" className="h-4 w-4" />
+                      </div>
+                      <p className="text-[11px] font-medium leading-relaxed text-brand-navy">
+                        <strong className="font-extrabold block mb-0.5 text-brand-blue">Kilas Insight</strong>
+                        Fasilitas daya publik mayoritas masih terpusat di kawasan Jawa dan kota-kota strategis.
+                      </p>
+                    </div>
+                    
+                    <div className="flex-1 rounded-xl border border-brand-border bg-white p-3.5 shadow-sm flex flex-col min-h-0">
+                      <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Top Distribusi SPKLU</h3>
+                        <Icon name="trend" className="h-3.5 w-3.5 text-slate-300" />
+                      </div>
+                      <div className="min-h-0 flex-1">
+                        <ProvinceMiniBar data={visibleProvinceData} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -511,20 +524,23 @@ function ProvinceMiniBar({ data }: { data: ProvinceRecord[] }) {
   const { pos, onMouseMove } = useCursorTooltip();
   const max = Math.max(1, ...data.map((item) => item.station_count));
   return (
-    <div className="flex h-full flex-col justify-center gap-2" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
-      {data.map((item) => {
+    <div className="flex h-full flex-col justify-center gap-2.5" onMouseLeave={() => setHover(null)} onMouseMove={onMouseMove}>
+      {data.map((item, index) => {
         const pct = (item.station_count / max) * 100;
+        const isTop3 = index < 3;
+        const barColor = index === 0 ? "bg-brand-orange" : index === 1 ? "bg-brand-teal" : index === 2 ? "bg-brand-green" : "bg-brand-blue";
         return (
           <div
             key={item.province}
-            className="group grid grid-cols-[92px_1fr_34px] items-center gap-2 text-[11px] font-bold text-brand-navy cursor-pointer"
+            className="group grid grid-cols-[16px_86px_1fr_32px] items-center gap-2 text-[11px] font-bold text-brand-navy cursor-pointer"
             onMouseEnter={() => setHover(item)}
           >
+            <span className={`text-[9px] text-center w-4 h-4 rounded-full flex items-center justify-center ${isTop3 ? barColor + ' text-white shadow-sm' : 'bg-slate-100 text-slate-400'}`}>{index + 1}</span>
             <span className="leading-tight truncate group-hover:text-brand-blue transition-colors">{item.province}</span>
-            <div className="h-4 overflow-hidden rounded-sm bg-brand-soft">
-              <div className="h-full rounded-sm bg-brand-blue transition-all duration-300 group-hover:brightness-90" style={{ width: `${pct}%` }} />
+            <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+              <div className={`h-full rounded-full transition-all duration-500 group-hover:brightness-110 ${barColor}`} style={{ width: `${pct}%` }} />
             </div>
-            <span className="text-right group-hover:text-brand-blue transition-colors">{item.station_count}</span>
+            <span className={`text-right group-hover:text-brand-blue transition-colors ${isTop3 ? 'text-brand-navy' : 'text-slate-500'}`}>{item.station_count}</span>
           </div>
         );
       })}
