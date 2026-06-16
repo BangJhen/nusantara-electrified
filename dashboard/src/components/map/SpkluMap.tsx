@@ -17,11 +17,11 @@ export default function SpkluMap() {
       style: {
         version: 8,
         sources: {
-          "carto-dark": {
+          "carto-light": {
             type: "raster",
             tiles: [
-              "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
-              "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
+              "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
+              "https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png",
             ],
             tileSize: 256,
             attribution: "&copy; OpenStreetMap &copy; CARTO",
@@ -29,9 +29,9 @@ export default function SpkluMap() {
         },
         layers: [
           {
-            id: "carto-dark-layer",
+            id: "carto-light-layer",
             type: "raster",
-            source: "carto-dark",
+            source: "carto-light",
             minzoom: 0,
             maxzoom: 19,
           },
@@ -70,11 +70,11 @@ export default function SpkluMap() {
               "circle-color": [
                 "step",
                 ["get", "point_count"],
-                "#60a5fa",
+                "#12B6C8", // teal for small
                 50,
-                "#3b82f6",
+                "#FF6B00", // orange for medium
                 200,
-                "#2563eb",
+                "#1267D8", // blue for large
               ],
               "circle-radius": [
                 "step",
@@ -85,7 +85,7 @@ export default function SpkluMap() {
                 200,
                 32,
               ],
-              "circle-opacity": 0.8,
+              "circle-opacity": 0.85,
             },
           });
 
@@ -96,10 +96,10 @@ export default function SpkluMap() {
             source: "spklu",
             filter: ["!", ["has", "point_count"]],
             paint: {
-              "circle-color": "#60a5fa",
+              "circle-color": "#FF6B00",
               "circle-radius": 6,
               "circle-stroke-width": 1,
-              "circle-stroke-color": "#3b82f6",
+              "circle-stroke-color": "#FFFFFF",
               "circle-opacity": 0.9,
             },
           });
@@ -165,8 +165,8 @@ export default function SpkluMap() {
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="w-full h-full" />
       {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-navy-950">
-          <div className="text-slate-400 text-sm">Memuat peta...</div>
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <div className="text-brand-dark font-bold text-sm">Memuat peta...</div>
         </div>
       )}
     </div>

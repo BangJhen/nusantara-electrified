@@ -69,7 +69,7 @@ export default function MetricCard({
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: delay / 1000 }}
-      className="glass-strong rounded-2xl p-6 glow-blue"
+      className="card p-6"
     >
       <div className="text-3xl md:text-4xl font-heading font-bold text-white mb-2">
         {prefix}

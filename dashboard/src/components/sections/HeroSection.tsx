@@ -33,7 +33,7 @@ export default function HeroSection() {
           className="text-4xl sm:text-5xl md:text-7xl font-heading font-bold text-white mb-6"
         >
           Nusantara{" "}
-          <span className="text-gradient-blue">Electrified</span>
+          <span className="text-brand-dark">Electrified</span>
         </motion.h1>
 
         <motion.p

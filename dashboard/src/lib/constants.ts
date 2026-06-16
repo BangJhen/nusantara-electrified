@@ -1,37 +1,41 @@
 export const COLORS = {
-  evBlue: "#3b82f6",
-  evBlueGlow: "#60a5fa",
-  evBlueDark: "#1e3a5f",
-  nickelGreen: "#22c55e",
-  nickelGreenLight: "#4ade80",
-  coalAmber: "#f59e0b",
-  coalAmberLight: "#fbbf24",
-  coalRed: "#ef4444",
-  navyBg: "#060a14",
-  navySurface: "#0a0f1c",
-  textPrimary: "#e2e8f0",
-  textSecondary: "#94a3b8",
-  textMuted: "#64748b",
-} as const;
+  // Compact dashboard palette inspired by the reference infographic.
+  navy: "#081D57",
+  blue: "#1267D8",
+  blue2: "#0B5ED7",
+  orange: "#FF6B00",
+  teal: "#12B6C8",
+  green: "#2F8F46",
+  yellow: "#F6B44B",
 
-export const CHART_COLORS = {
-  primary: COLORS.evBlue,
-  secondary: COLORS.nickelGreen,
-  tertiary: COLORS.coalAmber,
-  danger: COLORS.coalRed,
-  muted: COLORS.textMuted,
-} as const;
+  // Compatibility aliases used by existing chart components.
+  dark: "#081D57",
+  rust: "#FF6B00",
+  forest: "#2F8F46",
+  gold: "#F6B44B",
+  
+  // Layout colors
+  bgPrimary: "#F3F7FD",
+  bgPanel: "#FFFFFF",
+  
+  // Text colors
+  textPrimary: "#081D57",
+  textSecondary: "#42526E",
+  textMuted: "#7A8CAA",
+  
+  // Chart specifics
+  chartGrid: "#D8E5F3",
+};
 
-export const SECTIONS = [
-  { id: "hero", label: "Hero" },
-  { id: "adoption", label: "Adopsi" },
-  { id: "infrastructure", label: "Infrastruktur" },
-  { id: "emission", label: "Emisi" },
-  { id: "industry", label: "Industri" },
-  { id: "paradox", label: "Paradoks" },
-  { id: "barriers", label: "Hambatan" },
-  { id: "closing", label: "Penutup" },
-] as const;
+export const CHART_ANIMATION_DURATION = 1000;
 
 export const ICE_BASELINE_GCO2_PER_KM = 235;
 export const BEV_EFFICIENCY_KWH_PER_KM = 0.19;
+
+export const CHART_COLORS = {
+  primary: COLORS.blue,
+  secondary: COLORS.orange,
+  tertiary: COLORS.teal,
+  quaternary: COLORS.green,
+  muted: COLORS.textMuted,
+};

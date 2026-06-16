@@ -5,48 +5,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "ev-blue": {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a5f",
-        },
-        "nickel-green": {
-          300: "#86efac",
-          400: "#4ade80",
-          500: "#22c55e",
-          600: "#16a34a",
-        },
-        "coal-amber": {
-          300: "#fcd34d",
-          400: "#fbbf24",
-          500: "#f59e0b",
-          600: "#d97706",
-        },
-        "coal-red": {
-          400: "#f87171",
-          500: "#ef4444",
-          600: "#dc2626",
-        },
-        navy: {
-          800: "#0f172a",
-          900: "#0a0f1c",
-          950: "#060a14",
+        brand: {
+          navy: "#081D57",
+          blue: "#1267D8",
+          blue2: "#0B5ED7",
+          orange: "#FF6B00",
+          teal: "#12B6C8",
+          green: "#2F8F46",
+          bg: "#F3F7FD",
+          surface: "#FFFFFF",
+          soft: "#EAF3FF",
+          border: "#D8E5F3",
+          ink: "#0B174A",
+
+          // Compatibility aliases for older components while the dashboard is rebuilt.
+          dark: "#081D57",
+          rust: "#FF6B00",
+          forest: "#2F8F46",
+          gold: "#F6B44B",
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        heading: ["Space Grotesk", "system-ui", "sans-serif"],
+        sans: ["Open Sans", "system-ui", "sans-serif"],
+        heading: ["Oswald", "system-ui", "sans-serif"],
       },
-      backdropBlur: {
-        xs: "2px",
-      },
+      boxShadow: {
+        'card': '0 8px 24px rgba(8, 29, 87, 0.08)',
+        'panel': '0 2px 10px rgba(8, 29, 87, 0.06)',
+      }
     },
   },
   plugins: [],

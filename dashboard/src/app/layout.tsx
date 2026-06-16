@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Open_Sans, Oswald } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const openSans = Open_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-open-sans",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const oswald = Oswald({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  variable: "--font-oswald",
 });
 
 export const metadata: Metadata = {
-  title: "Nusantara Electrified — Data Story EV Indonesia",
-  description:
-    "Apakah EV Indonesia benar-benar siap menjadi transformasi nasional, atau baru sekadar tren pasar? Dashboard interaktif berbasis data.",
+  title: "EV INDONESIA - Tren, Tantangan & Kesiapan",
+  description: "Dashboard statistik perkembangan kendaraan listrik di Indonesia.",
 };
 
 export default function RootLayout({
@@ -24,8 +23,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body className="font-sans antialiased">{children}</body>
+    <html lang="id" className={`${openSans.variable} ${oswald.variable}`}>
+      <body className="font-sans antialiased bg-brand-bg text-brand-navy min-h-screen">
+        {children}
+      </body>
     </html>
   );
 }
